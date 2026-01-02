@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Team CRM</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="services.js"></script> 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            main: '#3b82f6',
+                            accent: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+        const SESSION_KEY = 'homeTeam_session_v6';
+        const API_URL = 'http://localhost:3000/api';
+        const AUTO_LOGOUT_TIME = 120 * 60 * 1000; 
+        const hashPass = (p) => `hash_${p}`;
+		// --- логін ---
+        const LoginScreen = ({ onLogin, users }) => {
+            const [email, setEmail] = useState('admin@hometeam.com');
+            const [password, setPassword] = useState('123'); 
+            const [error, setError] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const user = users.find(u => {
+                    const isEmailMatch = u.email === email;
+                    const isPasswordMatch = u.passwordHash === hashPass(password) || u.passwordHash === password;
+                    return isEmailMatch && isPasswordMatch;
+                });
+
+                if (user) {
+                    onLogin(user);
+                } else {
+                    setError("Невірні дані доступу");
+                }
+            };
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-brand-dark p-6">
+                    <div className="bg-white p-12 rounded-[50px] shadow-2xl w-full max-w-md fade-in text-center">
+                        <div className="mb-8 inline-block p-5 bg-blue-50 rounded-[30px]">
+                            <svg className="w-12 h-12 text-brand-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <h1 className="text-4xl font-[900] text-gray-900 mb-2">Home<span className="text-brand-main">Team</span></h1>
+                        <p className="text-gray-400 font-medium mb-10 uppercase text-xs tracking-[0.2em]">Система управління ЖК</p>
+                        
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            {error && <div className="bg-red-50 text-red-500 p-4 rounded-2xl text-sm font-bold border border-red-100">{error}</div>}
+                            <input 
+                                type="email" value={email} onChange={e => setEmail(e.target.value)}
+                                className="w-full bg-gray-50 border-2 border-transparent p-5 rounded-2xl focus:bg-white focus:border-brand-main outline-none transition-all font-bold text-gray-700"
+                                placeholder="Email" required 
+                            />
+                            <input 
+                                type="password" value={password} onChange={e => setPassword(e.target.value)}
+                                className="w-full bg-gray-50 border-2 border-transparent p-5 rounded-2xl focus:bg-white focus:border-brand-main outline-none transition-all font-bold text-gray-700"
+                                placeholder="Пароль" required 
+                            />
+                            <button className="w-full bg-brand-main text-white font-[900] py-5 rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-600 transition-all active:scale-95 text-lg">
+                                Увійти в систему
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---СКЛАД---
+       const InventoryView = ({ inventory, setInventory, addLog }) => {
+    const [newItem, setNewItem] = React.useState({ item: '', quantity: 0, unit: 'шт' });
+
+    const addItem = () => {
+        if (!newItem.item) return;
+        const updated = [...inventory, { ...newItem, id: Date.now(), min: 5 }];
+        setInventory(updated);
+        addLog('Склад', `Додано новий матеріал: ${newItem.item}`);
+        setNewItem({ item: '', quantity: 0, unit: 'шт' });
+    };
+
+    const removeItem = (id, name) => {
+        if (confirm(`Видалити ${name}?`)) {
+            setInventory(inventory.filter(i => i.id !== id));
+            addLog('Склад', `Видалено матеріал: ${name}`);
+        }
+    };
+
+    const updateQty = (id, val) => {
+        const updated = inventory.map(i => i.id === id ? { ...i, quantity: parseInt(val) || 0 } : i);
+        setInventory(updated);
+    };
+
+    return (
+        <div className="fade-in">
+            <h2 className="text-2xl font-black mb-6">Склад матеріалів</h2>
+            
+            {/* Форма створення нового матеріалу */}
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6 flex gap-4 items-end">
+                <div className="flex-1">
+                    <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Назва матеріалу</label>
+                    <input 
+                        className="w-full border-2 border-gray-50 p-3 rounded-xl mt-1 outline-none focus:border-brand-main"
+                        value={newItem.item}
+                        onChange={e => setNewItem({...newItem, item: e.target.value})}
+                        placeholder="Введіть назву..."
+                    />
+                </div>
+                <div className="w-24">
+                    <label className="text-[10px] font-black text-gray-400 uppercase ml-1">К-сть</label>
+                    <input 
+                        type="number"
+                        className="w-full border-2 border-gray-50 p-3 rounded-xl mt-1 outline-none focus:border-brand-main"
+                        value={newItem.quantity}
+                        onChange={e => setNewItem({...newItem, quantity: e.target.value})}
+                    />
+                </div>
+                <button onClick={addItem} className="bg-brand-main text-white px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest">Додати</button>
+            </div>
+
+            {/* Таблиця матеріалів */}
+            <div className="bg-white rounded-[35px] shadow-sm border border-gray-100 overflow-hidden">
+                <table className="w-full text-left">
+                    <thead className="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th className="p-5 text-[10px] font-black uppercase text-gray-400">Назва</th>
+                            <th className="p-5 text-[10px] font-black uppercase text-gray-400 text-center">Кількість</th>
+                            <th className="p-5 text-[10px] font-black uppercase text-gray-400 text-right">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {inventory.map(item => (
+                            <tr key={item.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
+                                <td className="p-5 font-bold text-gray-800">{item.item}</td>
+                                <td className="p-5 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <input 
+                                            type="number"
+                                            className="w-20 border-2 border-gray-100 rounded-lg p-1 text-center font-black focus:border-brand-main outline-none"
+                                            value={item.quantity}
+                                            onChange={(e) => updateQty(item.id, e.target.value)}
+                                        />
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase">{item.unit}</span>
+                                    </div>
+                                </td>
+                                <td className="p-5 text-right">
+                                    <button onClick={() => removeItem(item.id, item.item)} className="text-red-400 hover:text-red-600 font-bold p-2">✕</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+        // ---ПЕРСОНАЛ---
+        const StaffView = ({ users, shifts, logs, createUser, deleteUser, onUpdateProfile, currentUser }) => {
+            const [staffTab, setStaffTab] = useState('list');
+            const [showUserModal, setShowUserModal] = useState(false);
+            const [editingUser, setEditingUser] = useState(null);
+            
+            const handleEditClick = (user) => {
+                setEditingUser(user);
+            };
+
+            return (
+                <div className="space-y-8 fade-in">
+                    <div className="flex justify-between items-center">
+                        <div className="flex bg-white p-2 rounded-[24px] shadow-sm border border-gray-100">
+                            <button onClick={() => setStaffTab('list')} className={`px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${staffTab === 'list' ? 'bg-brand-dark text-white' : 'text-gray-400 hover:text-gray-600'}`}>Список команди</button>
+                            <button onClick={() => setStaffTab('shifts')} className={`px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${staffTab === 'shifts' ? 'bg-brand-dark text-white' : 'text-gray-400 hover:text-gray-600'}`}>Графік змін</button>
+                            <button onClick={() => setStaffTab('audit')} className={`px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${staffTab === 'audit' ? 'bg-brand-dark text-white' : 'text-gray-400 hover:text-gray-600'}`}>Аудит</button>
+                        </div>
+                        {staffTab === 'list' && (currentUser.role === 'admin' || currentUser.role === 'Адмін') && (
+    <button 
+        onClick={() => { setEditingUser(null); setShowUserModal(true); }}
+        className="bg-brand-main text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all"
+    >
+        + Додати працівника
+    </button>
+)}
+                    </div>
+
+                    {/* СПИСОК ПРАЦІВНИКІВ */}
+                    {staffTab === 'list' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {users.map(u => (
+                                <div key={u.id} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group relative">
+                                    <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        {(currentUser.role === 'admin' || currentUser.id === u.id) && (
+                                            <button 
+                                                onClick={() => handleEditClick(u)}
+                                                className="p-2 text-blue-400 hover:text-blue-600 bg-blue-50 rounded-xl transition-colors"
+                                                title="Редагувати"
+                                            >
+                                                ✎
+                                            </button>
+                                        )}
+                                        {(currentUser.role === 'admin' && currentUser.id !== u.id) && (
+                                            <button onClick={() => deleteUser(u.id)}
+                                                className="p-2 text-red-400 hover:text-red-600 bg-red-50 rounded-xl transition-colors"
+                                                title="Видалити"> ✕ </button>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-5 mb-6">
+                                        <img src={u.avatar || 'https://via.placeholder.com/150'} className="w-20 h-20 rounded-[30px] object-cover ring-4 ring-gray-50" />
+                                        <div>
+                                            <h4 className="font-[900] text-gray-900 text-lg leading-tight">{u.name}</h4>
+                                            <div className="text-brand-main text-xs font-black uppercase tracking-widest mt-1">{u.role}</div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3 pt-4 border-t border-gray-50 text-sm font-bold text-gray-700">
+                                        <p className="flex justify-between"><span className="text-gray-400 text-[10px] uppercase">Email:</span> {u.email}</p>
+                                        <p className="flex justify-between"><span className="text-gray-400 text-[10px] uppercase">Телефон:</span> {u.phone || 'Не вказано'}</p>
+										<p className="flex justify-between">
+											<span className="text-gray-400 text-[10px] uppercase">День народження:</span> 
+											{u.birthday ? new Date(u.birthday).toLocaleDateString('uk-UA') : 'Не вказано'}
+										</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                   {/* МОДАЛЬНЕ ВІКНО СТВОРЕННЯ/РЕДАГУВАННЯ */}
+                    {(showUserModal || editingUser) && (
+                        <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-md flex items-center justify-center z-[110] p-6">
+                            <div className="bg-white rounded-[40px] w-full max-w-md p-10 fade-in shadow-2xl">
+                                <h2 className="text-2xl font-black mb-6 uppercase tracking-tight">
+                                    {editingUser ? 'Редагувати дані' : 'Новий працівник'}
+                                </h2>
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const fd = new FormData(e.target);
+                                    const userData = {
+                                        id: editingUser ? editingUser.id : Date.now(),
+                                        name: fd.get('name'),
+                                        email: fd.get('email'),
+                                        phone: fd.get('phone'),
+                                        birthday: fd.get('birthday'), // Додаємо збір дати
+                                        role: fd.get('role') || (editingUser ? editingUser.role : 'worker')
+                                    };
+                                    if (!editingUser) {
+                                        userData.password = fd.get('pass');
+                                        userData.avatar = null; 
+                                        createUser(userData);
+                                        setShowUserModal(false);
+                                    } else {
+                                        userData.avatar = editingUser.avatar; // Зберігаємо старий аватар
+                                        onUpdateProfile(userData);
+                                        setEditingUser(null);
+                                    }
+                                }} className="space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">ПІБ</label>
+                                        <input name="name" defaultValue={editingUser?.name} placeholder="ПІБ" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" required />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Дата народження</label>
+                                        <input name="birthday" type="date" defaultValue={editingUser?.birthday} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email</label>
+                                            <input name="email" type="email" defaultValue={editingUser?.email} placeholder="Email" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" required />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Телефон</label>
+                                            <input name="phone" defaultValue={editingUser?.phone} placeholder="Телефон" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" />
+                                        </div>
+                                    </div>
+
+                                    {!editingUser && (
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Пароль</label>
+                                            <input name="pass" type="password" placeholder="Пароль" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" required />
+                                        </div>
+                                    )}
+
+<div className="space-y-1">
+    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Роль</label>
+    {/* Додаємо перевірку на українську роль 'Адмін' та 'Директор' */}
+    {(currentUser.role === 'admin' || currentUser.role === 'Адмін' || currentUser.role === 'Директор') ? (
+        <select name="role" defaultValue={editingUser?.role || 'Електрик'} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold outline-none focus:ring-2 ring-brand-main">
+            <option value="Адмін">Адміністратор</option>
+            <option value="Директор">Директор</option>
+            <option value="Менеджер">Менеджер</option>
+            <option value="Виконроб">Виконроб</option>
+            <option value="Електрик">Електрик</option>
+            <option value="Сантехнік">Сантехнік</option>
+            <option value="Прибиральник">Прибиральник(-ця)</option>
+        </select>
+    ) : (
+        <div className="p-4 bg-gray-100 rounded-2xl text-gray-500 font-bold italic">
+            {editingUser?.role || 'Працівник'}
+            <input type="hidden" name="role" value={editingUser?.role || 'Працівник'} />
+        </div>
+    )}
+</div>
+                                    <div className="flex gap-3 pt-4">
+                                        <button type="button" onClick={() => { setShowUserModal(false); setEditingUser(null); }} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400">Скасувати</button>
+                                        <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">
+                                            {editingUser ? 'Зберегти' : 'Створити'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+{/* РОЗКЛАД ЧЕРГУВАНЬ (SHIFTS) */}
+{staffTab === 'shifts' && (
+    <div className="bg-white rounded-[25px] md:rounded-[40px] p-5 md:p-10 border border-gray-100 shadow-sm fade-in">
+        <div className="flex justify-between items-center mb-6 md:mb-8">
+            <h3 className="text-lg md:text-xl font-[1000] tracking-tight uppercase italic">Розклад чергувань</h3>
+            
+            <div className="flex items-center gap-4">
+                <div className="bg-brand-main/10 text-brand-main px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                    {shifts.length} змін
+                </div>
+                
+                {/* КНОПКА ТІЛЬКИ ДЛЯ АДМІНА */}
+                {currentUser?.role === 'admin' && (
+                    <button 
+                        onClick={() => window.dispatchEvent(new CustomEvent('openShiftModal'))}
+                        className="bg-brand-main text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 transition-all shadow-lg"
+                    >
+                        + Додати зміну
+                    </button>
+                )}
+            </div>
+        </div>
+
+        <div className="table-container custom-scroll">
+            <table className="w-full text-left min-w-[500px]">
+                <thead className="bg-gray-50/50 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                    <tr>
+                        <th className="p-4 md:p-5 rounded-l-2xl">Працівник</th>
+                        <th className="p-4 md:p-5">Початок зміни</th>
+                        <th className="p-4 md:p-5">Кінець зміни</th>
+                        <th className="p-4 md:p-5 rounded-r-2xl">Статус</th>
+                    </tr>
+                </thead>
+                <tbody className="text-xs md:text-sm font-bold text-gray-700">
+                    {shifts.length > 0 ? shifts.map(shift => {
+                        const worker = users.find(u => u.id === Number(shift.userId));
+                        return (
+                            <tr key={shift.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                <td className="p-4 md:p-5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-brand-main/10 rounded-lg flex items-center justify-center text-brand-main text-[10px]">
+                                            {worker ? worker.name[0] : '?'}
+                                        </div>
+                                        <div>
+                                            <div className="font-black text-gray-900">{worker ? worker.name : 'Невідомо'}</div>
+                                            <div className="text-[9px] uppercase text-gray-400">{worker?.role}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-4 md:p-5 text-gray-500">
+                                    {new Date(shift.start).toLocaleString('uk-UA', {day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'})}
+                                </td>
+                                <td className="p-4 md:p-5 text-gray-500">
+                                    {new Date(shift.end).toLocaleString('uk-UA', {day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'})}
+                                </td>
+                                <td className="p-4 md:p-5">
+                                    <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${
+                                        shift.type === 'night' ? 'bg-indigo-50 text-indigo-500' : 'bg-orange-50 text-orange-500'
+                                    }`}>
+                                        {shift.type === 'night' ? 'Нічна' : 'Денна'}
+                                    </span>
+                                </td>
+                            </tr>
+                        )
+                    }) : (
+                        <tr>
+                            <td colSpan="4" className="p-12 text-center">
+                                <div className="text-gray-300 font-black uppercase text-[10px] tracking-widest">Розклад порожній</div>
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    </div>
+)}
+
+                    {/* АУДИТ (LOGS) */}
+                    {staffTab === 'audit' && (
+                        <div className="bg-brand-dark rounded-[40px] p-10 shadow-2xl flex flex-col overflow-hidden max-h-[600px]">
+                             <h3 className="text-xl font-black mb-8 tracking-tight text-white">Системний аудит</h3>
+                             <div className="overflow-y-auto custom-scroll space-y-4 pr-2">
+                                {logs.map(log => (
+                                    <div key={log.id} className="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                                        <div>
+                                            <div className="text-white font-bold text-sm">{log.action}</div>
+                                            <div className="text-gray-400 text-xs">{log.details}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-brand-main text-xs font-black uppercase">{log.user}</div>
+                                            <div className="text-gray-600 text-[10px]">{new Date(log.date).toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                             </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        // --- ГОЛОВНИЙ ДОДАТОК ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [showModal, setShowModal] = useState(false);
+            
+            // Стани даних (за замовчуванням порожні, завантажуємо з сервера)
+            const [archiveTasks, setArchiveTasks] = useState([]);
+            const [users, setUsers] = useState([]);
+            const [tasks, setTasks] = useState([]);
+            const [inventory, setInventory] = useState([]);
+            const [shifts, setShifts] = useState([]);
+            const [logs, setLogs] = useState([]);
+			const [complexes, setComplexes] = useState([]);
+			const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+			const [showShiftModal, setShowShiftModal] = useState(false);
+           // АВТОМАТИЧНЕ ПІДКЛЮЧЕННЯ: Сайт сам чекає на запуск сервера
+            useEffect(() => {
+                const connectToServer = async () => {
+                    try {
+                        const response = await fetch(`${API_URL}/data`);
+                        if (!response.ok) throw new Error('Сервер недоступний');
+                        
+                        const data = await response.json();
+                        
+                        if (data) {
+                            // Завантажуємо всі дані з сервера в стани React
+                            if (data.users) setUsers(data.users);
+                            if (data.tasks) setTasks(data.tasks);
+                            if (data.complexes) setComplexes(data.complexes);
+                            if (data.inventory) setInventory(data.inventory);
+                            if (data.shifts) setShifts(data.shifts);
+                            if (data.logs) setLogs(data.logs);
+                            if (data.archiveTasks) setArchiveTasks(data.archiveTasks);
+                            
+                            console.log("Зв'язок встановлено, дані завантажено");
+                        }
+                    } catch (err) {
+                        // Якщо ви ще не запустили "node server.js", сайт буде пробувати кожні 2 сек
+                        console.log("Очікування запуску сервера (localhost:3000)...");
+                        setTimeout(connectToServer, 2000); 
+                    }
+                };
+
+                connectToServer();
+            }, []);
+
+            const [currentUser, setCurrentUser] = useState(() => {
+                const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+                if (session && new Date().getTime() < session.expiry) return session.user;
+                return null;
+            });
+            // 1. ЗАВАНТАЖЕННЯ ДАНИХ З СЕРВЕРА ПРИ ЗАПУСКУ
+            useEffect(() => {
+                fetch(`${API_URL}/data`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("Дані завантажено:", data);
+                        if (data.users) setUsers(data.users);
+                        if (data.tasks) setTasks(data.tasks);
+                        if (data.inventory) setInventory(data.inventory);
+                        if (data.shifts) setShifts(data.shifts);
+                        if (data.logs) setLogs(data.logs);
+                        if (data.archiveTasks) setArchiveTasks(data.archiveTasks);
+						if (data.complexes) setComplexes(data.complexes);
+                    })
+                    .catch(err => console.error("Помилка завантаження даних:", err));
+            }, []);
+
+            // Функція для відправки змін на сервер
+            const saveToServer = (dataToSave) => {
+                fetch(`${API_URL}/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave)
+                })
+                .then(res => res.json())
+                .catch(err => console.error("Помилка збереження:", err));
+            };
+
+            // 2. ЗБЕРЕЖЕННЯ (Синхронізація при зміні стейту)
+            // Використовуємо useRef, щоб уникнути циклічних викликів при ініціалізації
+            const isFirstRun = useRef(true);
+            useEffect(() => {
+                if (isFirstRun.current) { isFirstRun.current = false; return; }
+                saveToServer({ tasks });
+            }, [tasks]);
+
+            useEffect(() => { if (!isFirstRun.current) saveToServer({ inventory }); }, [inventory]);
+            useEffect(() => { if (!isFirstRun.current) saveToServer({ shifts }); }, [shifts]);
+            useEffect(() => { if (!isFirstRun.current) saveToServer({ logs }); }, [logs]);
+            useEffect(() => { if (!isFirstRun.current) saveToServer({ archiveTasks }); }, [archiveTasks]);
+            useEffect(() => { if (!isFirstRun.current) saveToServer({ complexes }); }, [complexes]);
+            // Окремо для юзерів - вони йдуть в users.json через сервер
+            useEffect(() => { if (!isFirstRun.current) saveToServer({ users }); }, [users]);
+			useEffect(() => {
+				const handleOpen = () => setShowShiftModal(true);
+				window.addEventListener('openShiftModal', handleOpen);
+				return () => window.removeEventListener('openShiftModal', handleOpen);
+			}, []);
+            const handleLogin = (user) => {
+                const expiry = new Date().getTime() + AUTO_LOGOUT_TIME;
+                localStorage.setItem(SESSION_KEY, JSON.stringify({ user, expiry }));
+                setCurrentUser(user);
+                addLog("Вхід", "Авторизація успішна", user.name);
+            };
+
+            const addLog = (action, details, userName = currentUser?.name) => {
+                const newLog = { id: Date.now(), date: new Date().toISOString(), action, details, user: userName || "Система" };
+                setLogs(prev => [newLog, ...prev]);
+            };
+
+            const updateTaskStatus = (taskId, newStatus) => {
+                setTasks(prev => prev.map(t => t.id === taskId ? {...t, status: newStatus} : t));
+            };
+
+            const archiveTask = (taskId) => {
+                const taskToArchive = tasks.find(t => t.id === taskId);
+                if (taskToArchive) {
+                    setArchiveTasks(prev => [...prev, { ...taskToArchive, archivedAt: new Date().toISOString() }]);
+                    setTasks(prev => prev.filter(t => t.id !== taskId));
+                    addLog("Архів", `Завдання "${taskToArchive.title}" перенесено в архів`);
+                }
+            };
+
+            const deleteTask = (taskId, isFromArchive = false) => {
+                if (confirm("Ви впевнені, що хочете видалити це завдання назавжди?")) {
+                    if (isFromArchive) {
+                        setArchiveTasks(prev => prev.filter(t => t.id !== taskId));
+                    } else {
+                        setTasks(prev => prev.filter(t => t.id !== taskId));
+                    }
+                }
+            };
+
+            const createUser = (userData) => {
+                const newUser = {
+                    id: Date.now(),
+                    ...userData,
+                    passwordHash: userData.password, 
+                    avatar: null, 
+                    status: 'active',
+                    assignedComplexes: []
+                };
+                setUsers(prev => [...prev, newUser]);
+                addLog("Команда", `Створено користувача: ${newUser.name}`);
+            };
+
+            const deleteUser = (userId) => {
+                if (userId === currentUser.id) return alert("Ви не можете видалити власного користувача!");
+                if (confirm("Ви впевнені, що хочете видалити цього працівника?")) {
+                    setUsers(prev => prev.filter(u => u.id !== userId));
+                    addLog("Команда", `Видалено користувача ID: ${userId}`);
+                }
+            };
+
+            const updateProfile = (updatedData) => {
+                const newUserData = { ...currentUser, ...updatedData };
+                setUsers(prev => prev.map(u => u.id === updatedData.id ? { ...u, ...updatedData } : u));
+                
+                if (updatedData.id === currentUser.id) {
+                    setCurrentUser(prev => ({ ...prev, ...updatedData }));
+                    const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+                    if (session) {
+                        session.user = { ...session.user, ...updatedData };
+                        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                    }
+                }
+                addLog("Безпека", `Користувач ${currentUser.name} оновив профіль`);
+            };
+
+            const handleAvatarUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        updateProfile({ ...currentUser, avatar: reader.result });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            if (!currentUser) return <LoginScreen onLogin={handleLogin} users={users} />;
+
+            return (
+    <div className="flex h-screen bg-[#f8fafc] overflow-hidden relative">
+        
+        {/* МОБІЛЬНА ШАПКА — відображається лише на малих екранах */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-brand-dark flex items-center justify-between px-6 z-[60]">
+            <div className="text-white font-black uppercase tracking-tighter text-sm">HomeTeam</div>
+            <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                className="text-white p-2"
+            >
+                {isMobileMenuOpen ? '✕' : '☰'}
+            </button>
+        </div>
+
+        {/* SIDEBAR — адаптивне меню */}
+        <aside className={`
+            fixed inset-y-0 left-0 z-[100] w-72 bg-brand-dark text-white flex flex-col p-6 
+            transition-transform duration-300 ease-in-out shadow-2xl
+            ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+            lg:relative lg:translate-x-0 lg:w-80 lg:p-8 lg:shadow-none
+        `}>
+            {/* ЛОГОТИП */}
+            <div className="mb-12 px-2">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-brand-main rounded-[20px] flex items-center justify-center text-white shadow-lg">
+                        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 10.8L12 3l9 7.8v1.7c0 .4-.4.6-.8.4L12 6.6 3.8 12.9c-.4.2-.8 0-.8-.4v-1.7z"/>
+                            <path d="M5 11.5V21a1 1 0 001 1h4v-5a2 2 0 014 0v5h4a1 1 0 001-1v-9.5l-7-4.9-7 4.9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 className="text-xl lg:text-2xl font-[950] leading-none tracking-tighter uppercase">
+                            Home<span className="text-brand-main">Team</span>
+                        </h2>
+                        <span className="text-[10px] font-black text-gray-500 tracking-[0.4em]">CRM System</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* НАВІГАЦІЯ */}
+<nav className="flex-1 space-y-2 lg:space-y-3">
+    {[
+        { id: 'dashboard', label: 'Дашборд', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+        { id: 'kanban', label: 'Дошка задач', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2' },
+        { id: 'inventory', label: 'Матеріали', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10' },
+        { id: 'staff', label: 'Команда', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857' }, // Видалили adminOnly
+        { id: 'complexes', label: 'Комплекси', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16' },
+        { id: 'archive', label: 'Архів', icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4' },
+        { id: 'profile', label: 'Мій кабінет', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0z' }
+    ].map(item => (
+        // Тепер тут просто рендеримо всі пункти
+        <button 
+            key={item.id}
+            onClick={() => {
+                setActiveTab(item.id);
+                setIsMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-black text-xs uppercase tracking-[0.15em] ${activeTab === item.id ? 'bg-white/10 text-white shadow-inner' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+        >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={item.icon}/>
+            </svg>
+            {item.label}
+        </button>
+    ))}
+</nav>
+
+        {/* ПРОФІЛЬ ВНИЗУ */}
+            <div className="mt-auto pt-10">
+                <div className="bg-black/30 p-5 rounded-[30px] border border-white/5 flex items-center gap-4">
+                    <img 
+                        src={currentUser.avatar || 'https://via.placeholder.com/150'} 
+                        className="w-12 h-12 rounded-[18px] object-cover ring-2 ring-brand-main/20 shrink-0" 
+                    />
+                    <div className="flex-1 min-w-0 py-1">
+                        {/* Прибрано truncate, додано leading-tight для гарного вигляду при переносі */}
+                        <div className="font-black text-sm leading-tight break-words">
+                            {currentUser.name}
+                        </div>
+                        <div className="text-[10px] text-brand-main font-black uppercase tracking-widest mt-1">
+                            {currentUser.role}
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => {localStorage.removeItem(SESSION_KEY); setCurrentUser(null);}} 
+                        className="text-gray-600 hover:text-red-500 transition-colors shrink-0"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        {/* CONTENT */}
+        {/* pt-16 додано для мобілки, щоб контент не заїжджав під синю шапку h-16 */}
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden pt-16 lg:pt-0">
+            {/* Header: змінено px-12 на px-6 для мобілки, додано h-auto для гнучкості */}
+            <header className="h-20 lg:h-24 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-12 shrink-0">
+               <div className="min-w-0">
+    <h1 className="text-lg lg:text-2xl font-[950] text-gray-900 tracking-tight uppercase truncate">
+        {activeTab === 'dashboard' ? 'Панель керування' : 
+         activeTab === 'staff' ? 'Команда' : 
+         activeTab === 'profile' ? 'Мій профіль' : activeTab}
+    </h1>
+    <p className="hidden sm:block text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
+        {new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', weekday: 'short' })
+            .replace('пт', "п'ятниця") // На випадок скорочення
+            .replace('Пт', "П'ятниця")
+        }
+    </p>
+</div>
+                <div className="flex items-center gap-3 lg:gap-6">
+                    <button 
+                        onClick={() => setShowModal(true)} 
+                        className="bg-brand-main text-white px-4 lg:px-10 py-3 lg:py-4 rounded-xl lg:rounded-2xl font-[900] text-[10px] lg:text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+                    >
+                        + <span className="hidden sm:inline">Нове завдання</span><span className="sm:hidden">Завдання</span>
+                    </button>
+                </div>
+            </header>
+                        <div className="flex-1 overflow-y-auto p-12 custom-scroll">
+      {activeTab === 'dashboard' && (
+    <div className="space-y-10 fade-in pb-12">
+        {/* КАРТКИ СТАТИСТИКИ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+                { label: 'Заявки', val: tasks.length, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2', col: 'blue', desc: 'Всього в базі' },
+                { label: 'В роботі', val: tasks.filter(t => t.status === 'in-progress').length, icon: 'M13 10V3L4 14h7v7l9-11h-7z', col: 'amber', desc: 'Активні зараз' },
+                { label: 'Склад', val: inventory.length, icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', col: 'red', desc: 'Одиниць товару' },
+                { label: 'Команда', val: users.length, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', col: 'green', desc: 'Працівників' }
+            ].map(s => (
+                <div key={s.label} className="bg-white p-8 rounded-[48px] shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all group">
+                    <div className={`w-14 h-14 rounded-2xl bg-${s.col}-50 text-${s.col}-500 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform`}>
+                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={s.icon}/></svg>
+                    </div>
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{s.label}</div>
+                    <div className="flex items-baseline gap-2">
+                        <div className="text-4xl font-[950] text-gray-900 mt-2">{s.val}</div>
+                        <div className="text-[10px] font-bold text-gray-300 lowercase">{s.desc}</div>
+                    </div>
+                </div>
+            ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    {/* ОСТАННІ ДІЇ */}
+    <div className="lg:col-span-2 bg-white p-10 rounded-[48px] shadow-sm border border-gray-100">
+        <div className="flex justify-between items-center mb-8">
+            <h3 className="text-xl font-black flex items-center gap-3">
+                <span className="w-2 h-6 bg-brand-main rounded-full"></span> Останні дії
+            </h3>
+            <button className="text-[10px] font-black text-brand-main uppercase tracking-widest hover:underline">Архів логів</button>
+        </div>
+        <div className="space-y-4">
+            {logs.slice(0, 6).map(log => (
+                <div key={log.id} className="flex gap-4 items-center p-4 rounded-3xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group">
+                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-lg group-hover:bg-white shadow-sm">
+                        {log.action.includes('Створення') ? '➕' : log.action.includes('Видалення') ? '🗑️' : '📝'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="font-extrabold text-gray-800 text-sm truncate">{log.details}</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase">{log.action} • {log.user}</div>
+                    </div>
+                    <div className="text-[10px] font-bold text-gray-300">
+                        {new Date(log.date || Date.now()).toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'})}
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+
+    {/* ЦЕНТР ЕФЕКТИВНОСТІ (НОВИЙ) */}
+    <div className="bg-brand-dark text-white p-10 rounded-[48px] shadow-2xl relative overflow-hidden group border border-white/5">
+        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-main/20 rounded-full blur-3xl group-hover:bg-brand-main/40 transition-all duration-700"></div>
+        
+        <div className="relative z-10 space-y-8">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h3 className="text-xl font-[950] tracking-tight mb-1">Статус CRM</h3>
+                    <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Live System</span>
+                    </div>
+                </div>
+                <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+                    <svg className="w-6 h-6 text-brand-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+            </div>
+
+            {/* СТАТИСТИКА: ГОТОВО ТА ТРЕБА ЗРОБИТИ */}
+<div className="grid grid-cols-2 gap-4 border-y border-white/10 py-6">
+    <div className="text-center">
+        <div className="text-2xl font-[950] text-white">
+            {/* Беремо всі виконані */}
+            {tasks.filter(t => t.status === 'completed' || t.status === 'done').length}
+        </div>
+        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400 mt-1">Готово</div>
+    </div>
+    <div className="text-center border-l border-white/10">
+        <div className="text-2xl font-[950] text-white">
+            {/* ТУТ ЗМІНЕНО: Фільтруємо ті, що "Треба зробити" */}
+            {tasks.filter(t => t.status === 'todo' || t.status === 'new').length}
+        </div>
+        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400 mt-1">Треба зробити</div>
+    </div>
+</div>
+            {/* ПРОГРЕС-БАР */}
+            <div className="space-y-3">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <span>Виконання плану</span>
+                    <span className="text-white">
+                        {Math.round((tasks.filter(t => t.status === 'completed' || t.status === 'done').length / (tasks.length || 1)) * 100)}%
+                    </span>
+                </div>
+                <div className="h-3 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div 
+                        className="h-full bg-gradient-to-r from-brand-main to-blue-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.3)]" 
+                        style={{ width: `${(tasks.filter(t => t.status === 'completed' || t.status === 'done').length / (tasks.length || 1)) * 100}%` }}
+                    ></div>
+                </div>
+            </div>
+
+            {/* КНОПКИ ДІЙ */}
+            <div className="grid grid-cols-1 gap-3">
+                <button onClick={() => window.print()} className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all text-left group/btn">
+                    <span className="text-[10px] font-black uppercase tracking-widest">Експорт звіту</span>
+                    <span className="text-gray-400 text-[10px]">PDF/CSV</span>
+                </button>
+
+                <button 
+                    onClick={() => {
+                        const done = tasks.filter(t => t.status === 'completed' || t.status === 'done').length;
+                        const pending = tasks.filter(t => t.status === 'pending').length;
+                        const inProgress = tasks.filter(t => t.status === 'in-progress').length;
+                        
+                        alert(
+                            `📊 ПІДСУМОК ДНЯ\n` +
+                            `----------------------\n` +
+                            `✅ ВИКОНАНО: ${done}\n` +
+                            `⚙️ У РОБОТІ: ${inProgress}\n` +
+                            `----------------------\n` +
+                            `Ефективність: ${Math.round((done / (tasks.length || 1)) * 100)}%`
+                        );
+                    }}
+                    className="w-full py-4 bg-white text-brand-dark rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-main hover:text-white transition-all shadow-xl active:scale-95"
+                >
+                    🚀 Аналітика дня
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        {/* НОВИЙ ФУТЕР */}
+        <footer className="mt-16 pt-10 border-t border-gray-100">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div className="flex items-center gap-4">
+                    <div className="bg-gray-900 text-white w-12 h-12 rounded-[20px] flex items-center justify-center font-black text-xl shadow-lg">HT</div>
+                    <div>
+                        <h4 className="font-black text-gray-900 leading-none mb-1">Home Team CRM</h4>
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Спеціально для "Укр Житло Сервіс"</p>
+                    </div>
+                </div>
+
+                <div className="flex gap-10">
+                    <div className="hidden md:block">
+                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2 text-center">Статус</p>
+                        <p className="text-sm font-bold text-green-500 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> Сервери онлайн
+                        </p>
+                    </div>
+                    <div className="h-10 w-[1px] bg-gray-100 hidden md:block"></div>
+                    <div>
+                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2 text-center">Час системи</p>
+                        <p className="text-sm font-black text-gray-900 tabular-nums">
+                            {new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center md:items-end text-center md:text-right">
+                <p className="text-[9px] font-black text-black-300 uppercase tracking-[0.2em] leading-relaxed">
+                    © 2026 Home Team • Всі права захищені
+                </p>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                    Розробниця: <span className="text-gray-500">Вероніка Лебедовська</span>
+                </p>
+            </div>
+            </div>
+        </footer>
+    </div>
+)}
+{activeTab === 'kanban' && (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 h-full min-h-[600px]">
+        {['todo', 'in-progress', 'done'].map((statusId) => (
+            <div key={statusId} className="flex flex-col h-full">
+                <div className="flex items-center justify-between mb-8 px-5">
+                    <div className="flex items-center gap-4">
+                        <div className={`w-3 h-3 rounded-full ${statusId === 'todo' ? 'bg-gray-300' : statusId === 'in-progress' ? 'bg-brand-main' : 'bg-green-500'}`}></div>
+                        <h3 className="font-[950] text-gray-900 uppercase text-xs tracking-widest">
+                            {statusId === 'todo' ? 'Треба зробити' : statusId === 'in-progress' ? 'У роботі' : 'Готово'}
+                        </h3>
+                    </div>
+                    <span className="bg-white text-brand-main px-4 py-1 rounded-full text-[11px] font-[900] shadow-sm ring-1 ring-gray-100">
+                        {tasks.filter(t => t.status === statusId).length}
+                    </span>
+                </div>
+                
+                <div className="bg-gray-100/40 rounded-[50px] p-5 flex-1 overflow-y-auto custom-scroll space-y-5">
+                    {tasks.filter(task => task.status === statusId).map(task => {
+                        const worker = users.find(u => Number(u.id) === Number(task.assignee));
+                        // Пошук назви комплексу за ID
+                        const complex = complexes.find(c => String(c.id) === String(task.locationId));
+
+                        return (
+                            <div key={task.id} className="bg-white p-8 rounded-[35px] shadow-sm border border-gray-100 task-card group">
+                                <div className="flex justify-between items-start mb-5">
+                                    <span className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest ${task.priority === 'Critical' ? 'bg-red-100 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
+                                        {task.priority}
+                                    </span>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => archiveTask(task.id)} title="В архів" className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center hover:bg-amber-100 text-xs">📦</button>
+                                        <button onClick={() => deleteTask(task.id)} title="Видалити" className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-400 font-bold hover:bg-red-100">✕</button>
+                                    </div>
+                                </div>
+                                
+                                <h4 className="font-extrabold text-gray-900 leading-snug mb-2 text-lg tracking-tight">{task.title}</h4>
+                                
+                                <div className="flex items-center gap-2 text-gray-400 font-bold text-[10px] mb-6 uppercase tracking-wider">
+                                    <svg className="w-3 h-3 text-brand-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span>{complex ? complex.name : 'Об\'єкт не вказано'}</span>
+                                </div>
+                                
+                                <div className="flex items-center justify-between pt-6 border-t border-gray-50">
+                                    {/* Стрілочка вліво */}
+                                    {statusId !== 'todo' && (
+                                        <button 
+                                            onClick={() => {
+                                                const prevStatus = statusId === 'done' ? 'in-progress' : 'todo';
+                                                updateTaskStatus(task.id, prevStatus);
+                                            }}
+                                            className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-400"
+                                        >
+                                            ←
+                                        </button>
+                                    )}
+
+                                    <div className="flex items-center gap-3">
+                                        <img src={worker?.avatar || 'https://via.placeholder.com/150'} className="w-8 h-8 rounded-lg object-cover" />
+                                        <div className="text-[10px] font-black text-gray-800 uppercase">{worker ? worker.name : 'Гість'}</div>
+                                    </div>
+
+                                    {/* Стрілочка вправо */}
+                                    {statusId !== 'done' && (
+                                        <button 
+                                            onClick={() => {
+                                                const nextStatus = statusId === 'todo' ? 'in-progress' : 'done';
+                                                updateTaskStatus(task.id, nextStatus);
+                                            }}
+                                            className="w-8 h-8 rounded-full border border-brand-main text-brand-main flex items-center justify-center hover:bg-blue-50 font-bold"
+                                        >
+                                            →
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        ))}
+    </div>
+)}
+
+{activeTab === 'complexes' && (
+    <div className="fade-in">
+        <div className="flex justify-between items-center mb-10">
+            <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">База об'єктів (ЖК)</h2>
+            <button 
+                onClick={() => {
+                    const name = prompt("Назва ЖК:");
+                    const city = prompt("Місто:", "Київ"); // Місто спочатку
+                    const addr = prompt("Адреса:");       // Потім адреса
+                    const head = prompt("ПІБ Голови ОСББ:");
+                    if (name) {
+                        const newCx = { 
+                            id: Date.now(), 
+                            name, 
+                            city: city || 'Київ',
+                            address: addr || '', 
+                            headName: head || 'Не вказано'
+                        };
+                        const updated = [...complexes, newCx];
+                        setComplexes(updated);
+                        saveToServer({ complexes: updated });
+                        addLog('Комплекси', `Додано новий об'єкт: ${name}`);
+                    }
+                }}
+                className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all"
+            >
+                + Додати об'єкт
+            </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {complexes.length === 0 && (
+                <div className="col-span-full py-20 text-center bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
+                    <div className="text-4xl mb-4">🏢</div>
+                    <div className="text-gray-400 font-bold">Список об'єктів порожній</div>
+                </div>
+            )}
+            {complexes.map(cx => (
+                <div key={cx.id} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group hover:shadow-md transition-all">
+                    <div className="flex justify-between items-start mb-6">
+                        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl">🏢</div>
+                        <button 
+                            onClick={() => {
+                                if(confirm('Видалити цей об\'єкт?')) {
+                                    const updated = complexes.filter(c => c.id !== cx.id);
+                                    setComplexes(updated);
+                                    saveToServer({ complexes: updated });
+                                    addLog('Комплекси', `Видалено об'єкт: ${cx.name}`);
+                                }
+                            }}
+                            className="w-8 h-8 rounded-xl bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                        >✕</button>
+                    </div>
+                    
+                    <h3 className="font-[950] text-gray-900 text-xl mb-1">{cx.name}</h3>
+                    
+                    {/* Вивід Міста та Адреси */}
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-wider mb-4">
+                        <span className="text-brand-main">{cx.city}</span>, {cx.address}
+                    </p>
+                    
+                    {/* Блок Голови ОСББ */}
+                    <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-2xl mb-2">
+                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">👤</div>
+                        <div>
+                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Голова ОСББ</p>
+                            <p className="text-xs font-black text-gray-800">{cx.headName}</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-50 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-300">
+                        <span>ID: {cx.id.toString().slice(-5)}</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                            <span className="text-green-600">Активний</span>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+)}{activeTab === 'inventory' && <InventoryView inventory={inventory} setInventory={setInventory} addLog={addLog} />}
+                            
+           {activeTab === 'staff' && (
+                                <StaffView 
+                                    users={users} 
+                                    shifts={shifts} 
+                                    logs={logs} 
+                                    createUser={createUser} 
+                                    deleteUser={deleteUser}
+                                    onUpdateProfile={updateProfile}
+                                    currentUser={currentUser}
+                                />
+                            )}
+
+               {activeTab === 'profile' && (
+    <div className="max-w-2xl mx-auto fade-in">
+        <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="h-32 bg-brand-main/10 relative"></div>
+            <div className="px-10 pb-10 relative">
+                <div className="flex justify-between items-end -mt-16 mb-8">
+                  <div className="relative group">
+    <img 
+        src={currentUser.avatar || 'https://via.placeholder.com/150'} 
+        className="w-32 h-32 rounded-[40px] border-8 border-white object-cover shadow-lg"
+        id="profile-avatar-preview"
+    />
+    <label className="absolute bottom-2 right-2 bg-white w-10 h-10 rounded-2xl shadow-xl flex items-center justify-center cursor-pointer hover:bg-brand-main hover:text-white transition-all border border-gray-100">
+        📷
+        <input 
+            type="file" 
+            accept="image/*" 
+            className="hidden" 
+            onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const base64String = event.target.result;
+                        // Оновлюємо візуально
+                        document.getElementById('profile-avatar-preview').src = base64String;
+                        // Оновлюємо в базі через функцію
+                        onUpdateProfile({ ...currentUser, avatar: base64String });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }}
+        />
+    </label>
+</div>
+                    
+                    <button 
+                        onClick={() => setActiveTab('staff')}
+                        className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-100"
+                    >
+                        Команда
+                    </button>
+                </div>
+
+                <div className="space-y-6">
+                    <div>
+                        <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">{currentUser.name}</h2>
+                        <span className="inline-block mt-2 px-4 py-1.5 bg-brand-main/10 text-brand-main rounded-xl text-[10px] font-black uppercase tracking-widest">
+                            {currentUser.role}
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-gray-50 p-6 rounded-3xl">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Email</p>
+                            <p className="font-bold text-gray-800">{currentUser.email}</p>
+                        </div>
+                        <div className="bg-gray-50 p-6 rounded-3xl">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Телефон</p>
+                            <p className="font-bold text-gray-800">{currentUser.phone || 'Не вказано'}</p>
+                        </div>
+                        <div className="bg-gray-50 p-6 rounded-3xl">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">День народження</p>
+                            <p className="font-bold text-gray-800">
+                                {currentUser.birthday ? new Date(currentUser.birthday).toLocaleDateString('uk-UA') : '—'}
+                            </p>
+                        </div>
+                        <div className="bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-gray-100">
+                            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">В команді з</p>
+                            <p className="font-bold text-gray-400">
+                                {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('uk-UA') : '01.01.2024'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-gray-50 grid grid-cols-1 gap-3">
+                        <h4 className="font-black text-[10px] uppercase tracking-widest text-gray-400">Безпека та дані</h4>
+                        
+                        <button 
+                            onClick={() => {
+                                const newPass = prompt("Введіть новий пароль:");
+                                if (newPass) {
+                                    onUpdateProfile({ ...currentUser, password: newPass });
+                                    alert("Пароль змінено!");
+                                }
+                            }}
+                            className="w-full py-4 rounded-2xl border-2 border-gray-100 text-gray-600 font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                        >
+                            🔒 Змінити пароль
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
+                            {activeTab === 'archive' && (
+                                <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden fade-in">
+                                    <div className="p-8 border-b border-gray-50"><h3 className="text-xl font-black uppercase tracking-tight">Архів</h3></div>
+                                    <div className="divide-y divide-gray-50">
+                                        {archiveTasks.map(task => (
+                                            <div key={task.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
+                                                <div>
+                                                    <div className="font-bold text-gray-800">{task.title}</div>
+                                                    <div className="text-[10px] text-gray-400 uppercase font-black">Завершено: {new Date(task.archivedAt).toLocaleDateString()}</div>
+                                                </div>
+                                                <button onClick={() => deleteTask(task.id, true)} className="text-red-400 hover:text-red-600 font-black text-xs uppercase">Видалити</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+{showShiftModal && (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm" onClick={() => setShowShiftModal(false)}></div>
+        <div className="bg-white w-full max-w-md rounded-[35px] shadow-2xl relative overflow-hidden fade-in">
+            <div className="p-8">
+                <h3 className="text-xl font-[1000] uppercase italic tracking-tight mb-6">Нова зміна</h3>
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const newShift = {
+                        id: Date.now(),
+                        userId: Number(formData.get('userId')),
+                        start: formData.get('start'),
+                        end: formData.get('end'),
+                        type: formData.get('type')
+                    };
+                    // Рядок 470 автоматично збереже це на сервер через useEffect
+                    setShifts([...shifts, newShift]); 
+                    setShowShiftModal(false);
+                }} className="space-y-4">
+                    <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Співробітник</label>
+                        <select name="userId" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
+                            {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+                        </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Початок</label>
+                            <input type="datetime-local" name="start" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[10px]" required />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Кінець</label>
+                            <input type="datetime-local" name="end" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[10px]" required />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Тип зміни</label>
+                        <select name="type" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
+                            <option value="day">☀️ Денна</option>
+                            <option value="night">🌙 Нічна</option>
+                        </select>
+                    </div>
+                    <div className="flex gap-3 pt-4">
+                        <button type="button" onClick={() => setShowShiftModal(false)} className="flex-1 bg-gray-100 text-gray-500 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Скасувати</button>
+                        <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg">Створити</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+)}
+{showModal && (
+                        <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-xl flex items-center justify-center z-[100] p-6">
+                            <div className="bg-white rounded-[50px] w-full max-w-2xl shadow-2xl fade-in overflow-hidden">
+                                <div className="p-12">
+                                    <div className="flex justify-between items-center mb-10">
+                                        <h2 className="text-3xl font-[950] text-gray-900 tracking-tight uppercase">Нова Заявка</h2>
+                                        <button onClick={() => setShowModal(false)} className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-900 text-xl font-bold transition-all">✕</button>
+                                    </div>
+                                    
+                                    <form onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const fd = new FormData(e.target);
+                                        const nt = {
+                                            id: Date.now(),
+                                            title: fd.get('t'),
+                                            priority: fd.get('p'),
+                                            locationId: Number(fd.get('l')),
+                                            assignee: Number(fd.get('a')), 
+                                            status: 'todo',
+                                            createdAt: new Date().toISOString()
+                                        };
+                                        setTasks(prev => [...prev, nt]);
+                                        addLog("Заявка", `Створено задачу: ${nt.title.slice(0, 30)}...`);
+                                        setShowModal(false);
+                                    }} className="space-y-6">
+                                        
+                                        <div>
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Опис</label>
+                                            <textarea name="t" className="w-full border-2 border-gray-100 p-6 rounded-[30px] mt-2 outline-none focus:border-brand-main transition-all font-bold h-32 resize-none bg-gray-50 focus:bg-white" required />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Пріоритет</label>
+                                                <select name="p" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold">
+                                                    <option value="Низький">Низький</option>
+                                                    <option value="Середній">Середній</option>
+                                                    <option value="Високий">Високий</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Об'єкт (ЖК)</label>
+                                                <select name="l" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
+                                                    <option value="">Оберіть ЖК...</option>
+                                                    {complexes.map(cx => (
+                                                        <option key={cx.id} value={cx.id}>{cx.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Відповідальний</label>
+                                            <select name="a" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold">
+                                                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" className="w-full bg-brand-main text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-blue-600 transition-all">Створити</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
