@@ -35,8 +35,8 @@
         const hashPass = (p) => `hash_${p}`;
 		// --- логін ---
         const LoginScreen = ({ onLogin, users }) => {
-            const [email, setEmail] = useState('admin@hometeam.com');
-            const [password, setPassword] = useState('123'); 
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState(''); 
             const [error, setError] = useState('');
 
             const handleSubmit = (e) => {
