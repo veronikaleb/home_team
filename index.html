@@ -430,74 +430,60 @@
                 </div>
             );
         };
-        // --- ГОЛОВНИЙ ДОДАТОК ---
-        const App = () => {
-            const [activeTab, setActiveTab] = useState('dashboard');
-            const [showModal, setShowModal] = useState(false);
+   // --- ГОЛОВНИЙ ДОДАТОК ---
+const App = () => {
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [showModal, setShowModal] = useState(false);
+    
+    // Стейти
+    const [archiveTasks, setArchiveTasks] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [tasks, setTasks] = useState([]);
+    const [inventory, setInventory] = useState([]);
+    const [shifts, setShifts] = useState([]);
+    const [logs, setLogs] = useState([]);
+    const [complexes, setComplexes] = useState([]);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showShiftModal, setShowShiftModal] = useState(false);
+
+    // ОДИН ЄДИНИЙ ЕФЕКТ ДЛЯ ЗАВАНТАЖЕННЯ
+useEffect(() => {
+    const loadData = async () => {
+        try {
+            const res = await fetch(`${API_URL}/data`);
+            const data = await res.json();
             
-            // Стани даних (за замовчуванням порожні, завантажуємо з сервера)
-            const [archiveTasks, setArchiveTasks] = useState([]);
-            const [users, setUsers] = useState([]);
-            const [tasks, setTasks] = useState([]);
-            const [inventory, setInventory] = useState([]);
-            const [shifts, setShifts] = useState([]);
-            const [logs, setLogs] = useState([]);
-			const [complexes, setComplexes] = useState([]);
-			const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-			const [showShiftModal, setShowShiftModal] = useState(false);
-           // АВТОМАТИЧНЕ ПІДКЛЮЧЕННЯ: Сайт сам чекає на запуск сервера
-            useEffect(() => {
-                const connectToServer = async () => {
-                    try {
-                        const response = await fetch(`${API_URL}/data`);
-                        if (!response.ok) throw new Error('Сервер недоступний');
-                        
-                        const data = await response.json();
-                        
-                        if (data) {
-                            // Завантажуємо всі дані з сервера в стани React
-                            if (data.users) setUsers(data.users);
-                            if (data.tasks) setTasks(data.tasks);
-                            if (data.complexes) setComplexes(data.complexes);
-                            if (data.inventory) setInventory(data.inventory);
-                            if (data.shifts) setShifts(data.shifts);
-                            if (data.logs) setLogs(data.logs);
-                            if (data.archiveTasks) setArchiveTasks(data.archiveTasks);
-                            
-                            console.log("Зв'язок встановлено, дані завантажено");
-                        }
-                    } catch (err) {
-                        // Якщо ви ще не запустили "node server.js", сайт буде пробувати кожні 2 сек
-                        console.log("Очікування запуску сервера (localhost:3000)...");
-                        setTimeout(connectToServer, 2000); 
-                    }
-                };
+            if (data) {
+                // ПРИМУСОВО встановлюємо масиви, навіть якщо база віддала null
+                setTasks(data.tasks || []);
+                setInventory(data.inventory || []); // Матеріали
+                setComplexes(data.complexes || []); // ЖК
+                setUsers(data.users || []);         // Працівники
+                setShifts(data.shifts || []);
+                setLogs(data.logs || []);
+                setArchiveTasks(data.archiveTasks || []);
+                
+                console.log("Дані завантажено успішно");
+                console.table({
+                    "Заявки": (data.tasks || []).length,
+                    "Матеріали": (data.inventory || []).length,
+                    "Працівники": (data.users || []).length,
+                    "Об'єкти (ЖК)": (data.complexes || []).length
+                });
+            }
+        } catch (e) {
+            console.error("Помилка:", e);
+        }
+    };
+    loadData();
+}, []);// Порожні дужки означають, що завантаження буде ТІЛЬКИ ОДИН РАЗ при старті
 
-                connectToServer();
-            }, []);
-
-            const [currentUser, setCurrentUser] = useState(() => {
-                const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-                if (session && new Date().getTime() < session.expiry) return session.user;
-                return null;
-            });
-            // 1. ЗАВАНТАЖЕННЯ ДАНИХ З СЕРВЕРА ПРИ ЗАПУСКУ
-            useEffect(() => {
-                fetch(`${API_URL}/data`)
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log("Дані завантажено:", data);
-                        if (data.users) setUsers(data.users);
-                        if (data.tasks) setTasks(data.tasks);
-                        if (data.inventory) setInventory(data.inventory);
-                        if (data.shifts) setShifts(data.shifts);
-                        if (data.logs) setLogs(data.logs);
-                        if (data.archiveTasks) setArchiveTasks(data.archiveTasks);
-						if (data.complexes) setComplexes(data.complexes);
-                    })
-                    .catch(err => console.error("Помилка завантаження даних:", err));
-            }, []);
-
+    const [currentUser, setCurrentUser] = useState(() => {
+        const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+        if (session && new Date().getTime() < session.expiry) return session.user;
+        return null;
+    });
+    
             // Функція для відправки змін на сервер
             const saveToServer = (dataToSave) => {
                 fetch(`${API_URL}/save`, {
