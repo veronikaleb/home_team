@@ -1,0 +1,92 @@
+{
+  "tasks": [
+    {
+      "id": 101,
+      "title": "Заміна ламп у холі",
+      "locationId": 1,
+      "status": "todo",
+      "assignee": 3,
+      "priority": "Low",
+      "createdAt": "2024-01-10T10:00:00.000Z"
+    },
+    {
+      "id": 1767352122516,
+      "title": "аркерокеркер",
+      "priority": "Низький",
+      "assignee": 2,
+      "userId": 2,
+      "status": "in-progress",
+      "createdAt": "2026-01-02T11:08:42.516Z"
+    },
+    {
+      "id": 1767369926549,
+      "title": "купити лампочки на 5 під'їзд",
+      "priority": "Низький",
+      "locationId": 1767352964670,
+      "assignee": 4,
+      "status": "done",
+      "createdAt": "2026-01-02T16:05:26.549Z"
+    },
+    {
+      "id": 1767789982204,
+      "title": "прикрутити кріплення",
+      "priority": "Низький",
+      "locationId": 1767352964670,
+      "assignee": 1767785779910,
+      "status": "done",
+      "createdAt": "2026-01-07T12:46:22.204Z"
+    }
+  ],
+  "shifts": [
+    {
+      "id": 1768147300341,
+      "userId": 1767785779910,
+      "type": "day",
+      "isRecurring": true,
+      "daysRange": "Пн-Пт",
+      "timeRange": "08:00 - 16:00",
+      "start": null,
+      "end": null
+    }
+  ],
+  "archiveTasks": [
+    {
+      "id": 1767351054412,
+      "title": "купити лампочку",
+      "priority": "Низький",
+      "assignee": 2,
+      "userId": 2,
+      "status": "done",
+      "createdAt": "2026-01-02T10:50:54.412Z",
+      "archivedAt": "2026-01-02T10:51:21.374Z"
+    }
+  ],
+  "complexes": [
+    {
+      "id": 1767352964670,
+      "name": "Новатор",
+      "address": "Михайла Матюшенка 16",
+      "city": "Київ"
+    },
+    {
+      "id": 1767353762859,
+      "name": "Річ Таун",
+      "address": "Мрії 2",
+      "city": "Київ"
+    },
+    {
+      "id": 1767353892543,
+      "name": "Київський",
+      "city": "Київ",
+      "address": "Академіка Паладіна 2",
+      "headName": "Кравченко Олена"
+    },
+    {
+      "id": 1768132695383,
+      "name": "Бургундія",
+      "city": "Ірпінь",
+      "address": "Батозька 4-А, 4-Б",
+      "headName": "Місюренко Оксана Василівна"
+    }
+  ]
+}

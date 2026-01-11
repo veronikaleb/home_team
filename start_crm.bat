@@ -1,6 +1,0 @@
-@echo off
-echo Zapusk SERVERA...
-start cmd /k "node server.js"
-echo Zapusk SAYTU...
-timeout /t 2
-start "" "index.html"

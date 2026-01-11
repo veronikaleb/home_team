@@ -1,75 +1,116 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
+
+// --- Налаштування статичних файлів ---
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
 
-const DB_PATH = path.join(__dirname, 'db.json');
-const USERS_PATH = path.join(__dirname, 'users.json');
+// Шляхи до файлів
+const DB_PATH = path.join(__dirname, 'databases/db.json');
+const USERS_PATH = path.join(__dirname, 'databases/users.json');
+const LOGS_PATH = path.join(__dirname, 'databases/logs.json');
+const INVENTORY_PATH = path.join(__dirname, 'databases/inventory.json'); // НОВИЙ ШЛЯХ
 
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log('✅ MongoDB підключено');
-        forceMigration(); 
+// Перевірка і створення необхідних папок
+const dirs = [path.join(__dirname, 'images'), path.join(__dirname, 'databases')];
+dirs.forEach(dir => {
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir, { recursive: true });
+    }
+});
+
+const readJSON = (filePath) => {
+    if (!fs.existsSync(filePath)) return null;
+    try {
+        const data = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(data);
+    } catch (e) {
+        return null;
+    }
+};
+
+// --- Робота з Мультимедіа (Multer) ---
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images'); 
+    },
+    filename: (req, file, cb) => {
+        const fileName = `avatar-${Date.now()}${path.extname(file.originalname)}`;
+        cb(null, fileName);
+    }
+});
+const upload = multer({ storage: storage });
+
+app.post('/api/upload', upload.single('avatar'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Файл не завантажено' });
+    const imageUrl = `http://localhost:3000/images/${req.file.filename}`;
+    res.json({ url: imageUrl });
+});
+
+// --- API роути ---
+
+app.get('/api/data', (req, res) => {
+    const dbData = readJSON(DB_PATH) || {};
+    const usersData = readJSON(USERS_PATH) || [];
+    const logsData = readJSON(LOGS_PATH) || [];
+    const inventoryData = readJSON(INVENTORY_PATH) || []; // Читаємо окремий файл складу
+
+    const fullData = { 
+        tasks: [], shifts: [], 
+        archiveTasks: [], complexes: [], 
+        ...dbData, 
+        users: usersData,
+        logs: logsData,
+        inventory: inventoryData // Віддаємо дані складу фронтенду
+    };
+    res.json(fullData);
+});
+
+app.post('/api/save', (req, res) => {
+    const incomingData = req.body;
+
+    // 1. Збереження користувачів
+    if (incomingData.users) {
+        fs.writeFileSync(USERS_PATH, JSON.stringify(incomingData.users, null, 2));
+    }
+
+    // 2. Збереження логів
+    if (incomingData.logs) {
+        fs.writeFileSync(LOGS_PATH, JSON.stringify(incomingData.logs, null, 2));
+    }
+
+    // 3. НОВЕ: Збереження складу в inventory.json
+    if (incomingData.inventory) {
+        fs.writeFileSync(INVENTORY_PATH, JSON.stringify(incomingData.inventory, null, 2));
+    }
+
+    // 4. Збереження решти даних в db.json (ВИКЛЮЧАЄМО inventory)
+    const keysToSaveToDB = ['tasks', 'shifts', 'archiveTasks', 'complexes'];
+    let dbData = readJSON(DB_PATH) || {};
+    let dbChanged = false;
+
+    keysToSaveToDB.forEach(key => {
+        if (incomingData[key]) {
+            dbData[key] = incomingData[key];
+            dbChanged = true;
+        }
     });
 
-const CRMDataSchema = new mongoose.Schema({
-    tasks: Array, inventory: Array, shifts: Array, 
-    logs: Array, archiveTasks: Array, complexes: Array, users: Array
-});
-const CRMData = mongoose.model('CRMData', CRMDataSchema);
-
-async function forceMigration() {
-    console.log("⏳ Починаю повне перенесення даних...");
-    try {
-        const dbRaw = fs.readFileSync(DB_PATH, 'utf8');
-        const usersRaw = fs.readFileSync(USERS_PATH, 'utf8');
-
-        const dbFileData = JSON.parse(dbRaw);
-        const usersFileData = JSON.parse(usersRaw);
-
-        // Формуємо повний пакет даних
-        const finalData = {
-            tasks: dbFileData.tasks || [],
-            inventory: dbFileData.inventory || [], // МАТЕРІАЛИ
-            complexes: dbFileData.complexes || [], // ОБ'ЄКТИ
-            shifts: dbFileData.shifts || [],
-            logs: dbFileData.logs || [],
-            archiveTasks: dbFileData.archiveTasks || [],
-            users: usersFileData || [] // ПРАЦІВНИКИ
-        };
-
-        // Очищаємо і записуємо
-        await CRMData.deleteMany({}); 
-        await CRMData.create(finalData);
-        
-        console.log("🚀 ПЕРЕМОГА! Все перенесено:");
-        console.log(`- Заявок: ${finalData.tasks.length}`);
-        console.log(`- Матеріалів: ${finalData.inventory.length}`);
-        console.log(`- Працівників: ${finalData.users.length}`);
-        console.log(`- Об'єктів: ${finalData.complexes.length}`);
-
-    } catch (e) {
-        console.error("❌ Помилка під час збору даних:", e.message);
+    if (dbChanged) {
+        fs.writeFileSync(DB_PATH, JSON.stringify(dbData, null, 2));
     }
-}
 
-app.get('/api/data', async (req, res) => {
-    const data = await CRMData.findOne();
-    res.json(data || {});
+    res.json({ success: true });
 });
 
-app.post('/api/save', async (req, res) => {
-    try {
-        await CRMData.findOneAndUpdate({}, { $set: req.body }, { upsert: true });
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ success: false }); }
+app.listen(3000, () => {
+    console.log('SERVER RUNNING on http://localhost:3000');
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));

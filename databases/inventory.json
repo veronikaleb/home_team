@@ -1,0 +1,11 @@
+[
+  {
+    "item": "Лампочка",
+    "model": "Lebron Led",
+    "quantity": 40,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768148574443
+  }
+]
