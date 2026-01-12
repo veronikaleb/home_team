@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Home Team | Service Ecosystem</title>
+    <title>Home Team</title>
+    <link rel="stylesheet" href="css/site_style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@1,700;1,900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { brand: { main: '#0566C7', dark: '#050505' } },
+                    colors: { 
+                        brand: { 
+                            main: '#0566C7', 
+                            accent: '#00D4FF',
+                            dark: '#050505' 
+                        } 
+                    },
                     animation: { 'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
                 }
             }
@@ -38,7 +45,7 @@
             <div class="flex flex-col items-start select-none">
                 <h2 class="text-lg lg:text-2xl font-bold tracking-tighter uppercase flex items-center leading-none">
                     <span class="italic text-white flex items-center justify-center">Home</span>
-                    <span class="italic ml-1 text-brand-main">Team</span>
+                    <span class="italic ml-1 text-brand-accent">Team</span>
                 </h2>
                 <span class="text-[7px] lg:text-[9px] font-black text-gray-500 tracking-[0.3em] lg:tracking-[0.4em] uppercase mt-1">Service Platform</span>
             </div>
@@ -48,9 +55,13 @@
                 <a href="#roles" class="hover:text-white transition-colors">Ролі</a>
                 <a href="#workflow" class="hover:text-white transition-colors">Процеси</a>
                 <a href="#tech" class="hover:text-white transition-colors">Технології</a>
+                <a href="#gallery" class="hover:text-white transition-colors">Візуальний контроль</a>
                 <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
             </div>
-
+            <button id="theme-toggle" class="p-2 rounded-full glass hover:bg-brand-accent/20 transition-all mr-2">
+                <svg id="theme-icon-sun" class="w-5 h-5 text-brand-accent" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+                <svg id="theme-icon-moon" class="hidden w-5 h-5 text-brand-main" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            </button>
             <div class="flex items-center gap-3">
                 <a href="app.html" class="hidden sm:inline-block bg-brand-main text-white px-5 lg:px-8 py-2 lg:py-2.5 rounded-full font-black text-[9px] lg:text-[10px] uppercase tracking-[0.2em] hover:bg-blue-700 transition-all">Увійти</a>
                 <button id="burger-btn" class="md:hidden text-white p-2 outline-none">
@@ -76,18 +87,20 @@
             <p class="text-[10px] text-gray-500 uppercase tracking-widest leading-loose">Specially for<br><span class="text-white font-black">Ukr Zhytlo Service</span></p>
         </div>
     </div>
-
-    <section class="relative min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 overflow-hidden">
-        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[300px] lg:h-[500px] bg-brand-main/10 blur-[80px] lg:blur-[120px] rounded-full -z-10 animate-pulse-slow"></div>
+<section class="relative min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(5,102,199,0.15)_0%,_rgba(11,14,20,1)_80%)] -z-20"></div>
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[900px] h-[400px] lg:h-[600px] bg-brand-accent/20 blur-[100px] lg:blur-[150px] rounded-full -z-10 animate-pulse-slow"></div>
+        
         <div class="max-w-5xl mx-auto text-center relative z-10">
-            <h1 class="text-4xl sm:text-6xl lg:text-[100px] font-black uppercase tracking-tighter italic leading-[0.9] lg:leading-none mb-6 lg:mb-8">
-                Синхронізація <br> <span class="text-transparent" style="-webkit-text-stroke: 1px white;">Вашого Сервісу</span>
+            <h1 class="text-4xl sm:text-6xl lg:text-[100px] font-black uppercase italic tracking-tighter leading-[0.9] lg:leading-none mb-6 lg:mb-8 text-white">
+                Синхронізація <br> <span class="text-transparent" style="-webkit-text-stroke: 1.5px #00D4FF; filter: drop-shadow(0 0 15px rgba(0,212,255,0.3));">Вашого Сервісу</span>
             </h1>
-            <p class="text-gray-400 text-sm sm:text-base lg:text-xl max-w-2xl mx-auto mb-10 lg:mb-12 px-2">
+            <p class="text-blue-100/70 text-sm sm:text-base lg:text-xl max-w-2xl mx-auto mb-10 lg:mb-12 px-2 font-medium">
                 Від графіка майстра до задоволеного мешканця. Міні-екосистема, яка перетворює хаос у чіткий алгоритм.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 px-4">
-                <a href="app.html" class="bg-white text-black px-10 lg:px-12 py-4 lg:py-5 rounded-xl lg:rounded-2xl font-black uppercase text-[10px] lg:text-[11px] tracking-widest hover:bg-brand-main hover:text-white transition-all text-center">
+                <a href="app.html" class="bg-brand-accent text-black px-10 lg:px-12 py-4 lg:py-5 rounded-xl lg:rounded-2xl font-black uppercase text-[10px] lg:text-[11px] tracking-widest hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,212,255,0.3)] text-center">
                     Почати Роботу
                 </a>
             </div>
@@ -95,31 +108,31 @@
     </section>
 
     <section id="benefits" class="py-20 lg:py-32 px-4 lg:px-6 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-brand-main/5 blur-[100px] rounded-full -z-10"></div>
+        <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-brand-accent/5 blur-[100px] rounded-full -z-10"></div>
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                 <div class="max-w-2xl">
                     <h2 class="text-4xl lg:text-7xl font-black uppercase italic tracking-tighter leading-none mb-6">
-                        Чому ми <span class="text-brand-main text-transparent" style="-webkit-text-stroke: 1px #0566C7;">кращі</span>
+                        Чому ми <span class="text-brand-accent text-transparent" style="-webkit-text-stroke: 1px #00D4FF;">кращі</span>
                     </h2>
                 </div>
                 <div class="hidden md:block h-px flex-grow bg-white/10 mx-10 mb-4"></div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                <div class="glass p-8 rounded-[40px] group hover:bg-brand-main/5 transition-all">
+                <div class="glass glass-blue p-8 rounded-[40px] group hover:bg-brand-accent/10 transition-all">
                     <div class="flex justify-between items-start mb-10">
-                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-brand-main group-hover:bg-brand-main group-hover:text-white transition-all duration-500">
+                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-all duration-500">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </div>
                         <span class="text-4xl font-black italic opacity-10 group-hover:opacity-100 transition-opacity">01</span>
                     </div>
                     <h3 class="text-2xl font-black uppercase italic mb-4">Централізоване управління</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Всі дані про співробітників, завдання та робочі процеси зберігаються в одному місці</span>.</p>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Всі дані про співробітників, завдання та робочі процеси зберігаються в одному місці.</p>
                 </div>
-                <div class="glass p-8 rounded-[40px] group hover:bg-brand-main/5 transition-all">
+                <div class="glass glass-blue p-8 rounded-[40px] group hover:bg-brand-accent/10 transition-all">
                     <div class="flex justify-between items-start mb-10">
-                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-brand-main group-hover:bg-brand-main group-hover:text-white transition-all duration-500">
+                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-all duration-500">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         </div>
                         <span class="text-4xl font-black italic opacity-10 group-hover:opacity-100 transition-opacity">02</span>
@@ -127,24 +140,16 @@
                     <h3 class="text-2xl font-black uppercase italic mb-4">Зручність для працівників</h3>
                     <p class="text-gray-500 text-sm leading-relaxed font-medium">Доступ до особистого кабінету, завдань, графіку змін та матеріалів онлайн.</p>
                 </div>
-               <div class="glass p-8 rounded-[40px] group hover:bg-brand-main/5 transition-all">
-                <div class="flex justify-between items-start mb-10">
-                    <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-brand-main group-hover:bg-brand-main group-hover:text-white transition-all duration-500">
-                        <!-- Чіткий замок -->
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 11c1.657 0 3 1.343 3 3v3a3 3 0 01-6 0v-3c0-1.657 1.343-3 3-3z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 11V7a5 5 0 00-10 0v4H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2z" />
-                        </svg>
+                <div class="glass glass-blue p-8 rounded-[40px] group hover:bg-brand-accent/10 transition-all">
+                    <div class="flex justify-between items-start mb-10">
+                        <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-all duration-500">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3 1.343 3 3v3a3 3 0 01-6 0v-3c0-1.657 1.343-3 3-3z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 11V7a5 5 0 00-10 0v4H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2z" /></svg>
+                        </div>
+                        <span class="text-4xl font-black italic opacity-10 group-hover:opacity-100 transition-opacity">03</span>
                     </div>
-                    <span class="text-4xl font-black italic opacity-10 group-hover:opacity-100 transition-opacity">03</span>
+                    <h3 class="text-2xl font-black uppercase italic mb-4">Безпека даних</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Збереження конфіденційної інформації та контроль доступу до ресурсів.</p>
                 </div>
-                <h3 class="text-2xl font-black uppercase italic mb-4">Безпека даних</h3>
-                <p class="text-gray-500 text-sm leading-relaxed font-medium">
-                    Збереження конфіденційної інформації та контроль доступу до ресурсів.
-                </p>
-            </div>
             </div>
         </div>
     </section>
@@ -152,10 +157,9 @@
     <section id="roles" class="py-16 lg:py-24 px-4 sm:px-6">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10 lg:mb-16 text-center md:text-left">
-                <h2 class="text-3xl sm:text-4xl lg:text-6xl font-black uppercase italic tracking-tighter mb-4">Повна Матриця <span class="text-brand-main">Ролей</span></h2>
+                <h2 class="text-3xl sm:text-4xl lg:text-6xl font-black uppercase italic tracking-tighter mb-4">Повна Матриця <span class="text-brand-accent">Ролей</span></h2>
                 <p class="text-gray-500 font-bold uppercase tracking-[0.1em] text-[10px] lg:text-sm">7 рівнів доступу для максимальної ефективності</p>
             </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <div class="glass p-6 lg:p-8 rounded-[30px] lg:rounded-[40px]">
                     <h4 class="text-lg lg:text-xl font-black uppercase italic mb-3">Адміністратор сайту</h4>
@@ -193,127 +197,208 @@
         </div>
     </section>
 
-    <section id="workflow" class="py-16 lg:py-24 px-4 sm:px-6 bg-white/[0.01]">
+    <section id="workflow" class="py-16 lg:py-24 px-4 sm:px-6 bg-brand-accent/5 border-y border-white/5">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black uppercase italic tracking-tighter mb-10 lg:mb-16 text-center">Шлях <span class="text-brand-main italic">Заявки</span></h2>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black uppercase italic tracking-tighter mb-10 lg:mb-16 text-center">Шлях <span class="text-brand-accent italic">Заявки</span></h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 lg:gap-0 relative">
                 <div class="p-6 text-center border-white/5 sm:border-b md:border-b-0">
-                    <div class="text-brand-main text-2xl lg:text-3xl font-black italic mb-2">01.</div>
+                    <div class="text-brand-accent text-2xl lg:text-3xl font-black italic mb-2">01.</div>
                     <div class="uppercase text-[9px] lg:text-[10px] font-black tracking-widest">Створення</div>
                 </div>
                 <div class="p-6 text-center border-white/5 md:border-l sm:border-b md:border-b-0">
-                    <div class="text-brand-main text-2xl lg:text-3xl font-black italic mb-2">02.</div>
+                    <div class="text-brand-accent text-2xl lg:text-3xl font-black italic mb-2">02.</div>
                     <div class="uppercase text-[9px] lg:text-[10px] font-black tracking-widest">Обробка</div>
                 </div>
                 <div class="p-6 text-center border-white/5 md:border-l sm:border-b md:border-b-0">
-                    <div class="text-brand-main text-2xl lg:text-3xl font-black italic mb-2">03.</div>
+                    <div class="text-brand-accent text-2xl lg:text-3xl font-black italic mb-2">03.</div>
                     <div class="uppercase text-[9px] lg:text-[10px] font-black tracking-widest">Виїзд</div>
                 </div>
                 <div class="p-6 text-center border-white/5 md:border-l sm:border-b md:border-b-0">
-                    <div class="text-brand-main text-2xl lg:text-3xl font-black italic mb-2">04.</div>
+                    <div class="text-brand-accent text-2xl lg:text-3xl font-black italic mb-2">04.</div>
                     <div class="uppercase text-[9px] lg:text-[10px] font-black tracking-widest">Звітність</div>
                 </div>
                 <div class="p-6 text-center border-white/5 md:border-l">
-                    <div class="text-brand-main text-2xl lg:text-3xl font-black italic mb-2">05.</div>
+                    <div class="text-brand-accent text-2xl lg:text-3xl font-black italic mb-2">05.</div>
                     <div class="uppercase text-[9px] lg:text-[10px] font-black tracking-widest">Архів</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="tech" class="py-24 px-6">
+    <section id="tech" class="py-12 lg:py-24 px-4 sm:px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="glass p-12 rounded-[50px] overflow-hidden relative">
-                <div class="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="glass p-6 sm:p-10 lg:p-12 rounded-[30px] sm:rounded-[50px] overflow-hidden relative">
+                <div class="absolute inset-0 bg-brand-accent/5 -z-10"></div> 
+                
+                <div class="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     <div>
-                       <h2 class="text-4xl font-black uppercase italic mb-6">Технологічний <br>Стек</h2>
-                        <ul class="space-y-4 text-sm font-bold uppercase tracking-widest text-gray-400">
-                            <li class="flex items-center gap-3"><span class="w-2 h-2 bg-brand-main rounded-full"></span> React 18 + для динамічного UI</li>
-                            <li class="flex items-center gap-3"><span class="w-2 h-2 bg-brand-main rounded-full"></span> Реальний час: WebSocket та REST API інтеграція</li>
-                            <li class="flex items-center gap-3"><span class="w-2 h-2 bg-brand-main rounded-full"></span> TailwindCSS для швидкого та адаптивного дизайну</li>
-                            <li class="flex items-center gap-3"><span class="w-2 h-2 bg-brand-main rounded-full"></span> Node.js + Express для стабільного бекенду</li>
-                            <li class="flex items-center gap-3"><span class="w-2 h-2 bg-brand-main rounded-full"></span> MongoDB для надійного збереження даних</li>
-                            <li class="flex items-center gap-3"><span class="w-2 h-2 bg-brand-main rounded-full"></span> GitHub для автоматизації та контролю версій</li>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black uppercase italic mb-6 sm:mb-8 leading-none">
+                            Технологічний <br class="hidden sm:block">Стек
+                        </h2>
+                        
+                        <ul class="space-y-4 text-[11px] sm:text-sm font-bold uppercase tracking-widest text-gray-400">
+                            <li class="flex items-center gap-3">
+                                <span class="flex-shrink-0 w-2 h-2 bg-brand-accent rounded-full"></span> 
+                                React 18+ для динамічного UI
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex-shrink-0 w-2 h-2 bg-brand-accent rounded-full"></span> 
+                                Реальний час: WebSocket та REST API
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex-shrink-0 w-2 h-2 bg-brand-accent rounded-full"></span> 
+                                TailwindCSS для адаптивного дизайну
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex-shrink-0 w-2 h-2 bg-brand-accent rounded-full"></span> 
+                                Node.js + Express для бекенду
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex-shrink-0 w-2 h-2 bg-brand-accent rounded-full"></span> 
+                                GitHub для контролю версій
+                            </li>
                         </ul>
                     </div>
-                    <div class="text-6xl lg:text-9xl font-black italic opacity-10 uppercase tracking-tighter">
+
+                    <div class="text-6xl sm:text-8xl lg:text-9xl font-black italic opacity-10 uppercase tracking-tighter text-brand-accent leading-none mt-4 lg:mt-0">
                         Eco<br>System
                     </div>
                 </div>
             </div>
         </div>
     </section>
+<section id="gallery" class="py-24 px-4 lg:px-6 relative overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(5,102,199,0.05)_0%,_transparent_60%)]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-6xl font-black uppercase italic tracking-tighter mb-4">
+                    Візуальний <span class="text-brand-accent">Контроль</span>
+                </h2>
+                <p class="text-gray-500 text-[10px] lg:text-xs font-bold uppercase tracking-[0.3em]">
+                    Подивіться, як виглядає ваш робочий простір
+                </p>
+            </div>
 
-  <section id="faq" class="py-24 px-6">
-    <div class="max-w-3xl mx-auto">
-        <h2 class="text-3xl font-black uppercase italic mb-12 text-center">Питання та відповіді</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+                
+                <div class="group relative overflow-hidden rounded-[40px] glass glass-blue p-4 lg:p-6 transition-all hover:border-brand-accent/50">
+                    <div class="aspect-video bg-gray-950/50 rounded-[30px] overflow-hidden relative p-4">
+                        <img src="images/1.png" alt="Дашборд" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-xl font-black uppercase italic text-white group-hover:text-brand-accent transition-colors">Дашборд</h4>
+                        <p class="text-gray-500 text-xs mt-2 uppercase font-medium tracking-wider">Загальна аналітика та стан усіх процесів у реальному часі</p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-[40px] glass glass-blue p-4 lg:p-6 transition-all hover:border-brand-accent/50">
+                    <div class="aspect-video bg-gray-950/50 rounded-[30px] overflow-hidden relative p-4">
+                        <img src="images/2.png" alt="Інвентар" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-xl font-black uppercase italic text-white group-hover:text-brand-accent transition-colors">Інвентар</h4>
+                        <p class="text-gray-500 text-xs mt-2 uppercase font-medium tracking-wider">Зручний облік матеріалів та розподіл за категоріями</p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-[40px] glass glass-blue p-4 lg:p-6 transition-all hover:border-brand-accent/50">
+                    <div class="aspect-video bg-gray-950/50 rounded-[30px] overflow-hidden relative p-4">
+                        <img src="images/3.png" alt="Дошка завдань" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-xl font-black uppercase italic text-white group-hover:text-brand-accent transition-colors">Дошка завдань</h4>
+                        <p class="text-gray-500 text-xs mt-2 uppercase font-medium tracking-wider">Керування статусами робіт та оперативне планування</p>
+                    </div>
+                </div>
+
+                <div class="group relative overflow-hidden rounded-[40px] glass glass-blue p-4 lg:p-6 transition-all hover:border-brand-accent/50">
+                    <div class="aspect-video bg-gray-950/50 rounded-[30px] overflow-hidden relative p-4">
+                        <img src="images/4.png" alt="Команда" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-xl font-black uppercase italic text-white group-hover:text-brand-accent transition-colors">Команда</h4>
+                        <p class="text-gray-500 text-xs mt-2 uppercase font-medium tracking-wider">Керування доступами та профілями співробітників</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+  <section id="faq" class="py-24 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(5,102,199,0.1)_0%,_transparent_50%)] -z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(0,212,255,0.05)_0%,_transparent_40%)] -z-10"></div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
+        <h2 class="text-3xl lg:text-5xl font-black uppercase italic mb-16 text-center tracking-tighter">
+            Питання <span class="text-brand-accent">&</span> відповіді
+        </h2>
+        
         <div class="space-y-4">
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
                     Чи працює система без інтернету?
-                    <span class="text-brand-main">+</span>
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
                     Ні, система потребує підключення до інтернету для роботи з даними, авторизації та синхронізації.
                 </p>
             </details>
 
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
                     Як додати нового майстра?
-                    <span class="text-brand-main">+</span>
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
                     Керівник або Адміністратор може додати нового співробітника через панель керування в один клік.
                 </p>
             </details>
 
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
                     Хто має доступ до архіву завдань?
-                    <span class="text-brand-main">+</span>
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
                     Доступ до архіву мають всі працівники компанії.
                 </p>
             </details>
 
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
                     Як змінити статус завдання?
-                    <span class="text-brand-main">+</span>
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
-                    Правіник може змінити статус завдання прямо на дошці задач, наприклад «В роботі» або «Готово».
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
+                    Працівник може змінити статус завдання прямо на дошці задач, наприклад «В роботі» або «Готово».
                 </p>
             </details>
 
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
                     Чи можна експортувати звіти?
-                    <span class="text-brand-main">+</span>
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
                     Так, усі звіти можна експортувати у форматі PDF або CSV через панель керування.
                 </p>
             </details>
 
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
-                    Хто може редагувати профілі співробітників?
-                    <span class="text-brand-main">+</span>
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
+                    Хто може редагувати профілі?
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
                     Профілі можуть редагувати самі користувачі або адміністратори системи, залежно від прав доступу.
                 </p>
             </details>
 
-            <details class="glass p-6 rounded-2xl group cursor-pointer">
-                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center">
+            <details class="glass glass-blue p-6 rounded-2xl group cursor-pointer hover:border-brand-accent/30 transition-all">
+                <summary class="font-black uppercase italic text-sm list-none flex justify-between items-center tracking-widest">
                     Як захищені дані в системі?
-                    <span class="text-brand-main">+</span>
+                    <span class="text-brand-accent group-open:rotate-45 transition-transform text-xl">+</span>
                 </summary>
-                <p class="text-gray-500 text-xs mt-4">
+                <p class="text-gray-400 text-[11px] sm:text-xs mt-4 leading-relaxed font-bold uppercase tracking-wider">
                     Дані шифруються та зберігаються на захищених серверах, доступ до них контролюється правами користувачів.
                 </p>
             </details>
@@ -326,11 +411,10 @@
             <div class="flex flex-col items-center lg:items-start select-none">
                 <h2 class="text-xl lg:text-2xl font-bold tracking-tighter uppercase flex items-center leading-none">
                     <span class="italic text-white">Home</span>
-                    <span class="italic ml-1 text-brand-main">Team</span>
+                    <span class="italic ml-1 text-brand-accent">Team</span>
                 </h2>
                 <span class="text-[9px] font-black text-gray-600 tracking-[0.4em] uppercase mt-3">Service Platform</span>
             </div>
-            
             <div class="text-center lg:text-right">
                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Розроблено спеціально для</p>
                 <p class="text-xs lg:text-sm font-black italic text-white uppercase tracking-tighter">Укр Житло Сервіс</p>
@@ -340,7 +424,6 @@
     </footer>
 
     <script>
-        // Смужка прогресу
         window.onscroll = function() {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -348,7 +431,6 @@
             document.getElementById("scroll-progress").style.width = scrolled + "%";
         };
 
-        // Логіка мобільного меню
         const burgerBtn = document.getElementById('burger-btn');
         const closeBtn = document.getElementById('close-btn');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -361,11 +443,33 @@
 
         burgerBtn.addEventListener('click', toggleMenu);
         closeBtn.addEventListener('click', toggleMenu);
-        
-        // Закриття меню при кліку на посилання
-        navLinks.forEach(link => {
-            link.addEventListener('click', toggleMenu);
-        });
+        navLinks.forEach(link => { link.addEventListener('click', toggleMenu); });
+
+        const themeToggle = document.getElementById('theme-toggle');
+const sunIcon = document.getElementById('theme-icon-sun');
+const moonIcon = document.getElementById('theme-icon-moon');
+
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    
+    // Перемикання іконок
+    if (document.body.classList.contains('light-theme')) {
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+        localStorage.setItem('theme', 'light');
+    } else {
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+        localStorage.setItem('theme', 'dark');
+    }
+});
+
+// Перевірка збереженої теми при завантаженні
+if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-theme');
+    sunIcon.classList.add('hidden');
+    moonIcon.classList.remove('hidden');
+}
     </script>
 </body>
 </html>
