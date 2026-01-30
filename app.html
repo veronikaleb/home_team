@@ -285,6 +285,158 @@ const InventoryView = ({ inventory, setInventory, addLog }) => {
         </div>
     );
 };
+// календар
+const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer, addLog, currentUser }) => {
+    const [showModal, setShowModal] = useState(false);
+
+   const syncWithFile = async (updatedList) => {
+        // 1. Оновлюємо стан в пам'яті (щоб зразу бачити зміни в інтерфейсі)
+        setMaintenance(updatedList);
+        
+        // 2. Відправляємо на сервер у форматі { maintenance: [...] }
+        try {
+            // Викликаємо загальну функцію збереження, передаючи ключ maintenance
+            // Це змусить сервер оновити файл databases/maintenance.json
+            await saveToServer({ maintenance: updatedList });
+            console.log("Календар ТО синхронізовано з сервером");
+        } catch (error) {
+            console.error("Помилка при збереженні ТО:", error);
+            alert("Помилка збереження календаря!");
+        }
+    };
+    const getStatusBadge = (dateStr, status) => {
+        if (status === 'completed') return <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Виконано</span>;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const taskDate = new Date(dateStr);
+        const diffDays = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) return <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Протерміновано</span>;
+        if (diffDays <= 3) return <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black animate-pulse uppercase tracking-tighter">Увага: {diffDays === 0 ? 'сьогодні' : `через ${diffDays} дн.`}</span>;
+        return <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Заплановано</span>;
+    };
+
+    const handleAddTask = (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        
+        const newTask = {
+            id: Date.now(),
+            title: fd.get('title'),
+            complexId: fd.get('complexId'),
+            complexName: complexes.find(c => c.id.toString() === fd.get('complexId'))?.name || 'Обʼєкт',
+            date: fd.get('date'),
+            type: fd.get('type'),
+            status: 'planned'
+        };
+
+        const updated = [...maintenance, newTask];
+        syncWithFile(updated); 
+        addLog('ТО', `Додано: ${newTask.title}`);
+        setShowModal(false);
+    };
+
+    const handleToggleStatus = (task) => {
+        const newStatus = task.status === 'completed' ? 'planned' : 'completed';
+        const updated = maintenance.map(t => t.id === task.id ? {...t, status: newStatus} : t);
+        syncWithFile(updated);
+        addLog('ТО', `Статус змінено: ${task.title}`);
+    };
+
+    return (
+        <div className="fade-in space-y-8 p-2">
+            <div className="flex justify-between items-center px-4">
+                <div>
+                    <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">Технічне обслуговування</h2>
+                    <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 italic">База даних: maintenance.json</p>
+                </div>
+                <button onClick={() => setShowModal(true)} className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 transition-all">+ Запланувати ТО</button>
+            </div>
+
+            <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
+                <table className="w-full text-left border-collapse">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                        <tr>
+                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Дата</th>
+                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Об'єкт та задача</th>
+                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Тип</th>
+                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Статус</th>
+                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {maintenance.length === 0 ? (
+                            <tr><td colSpan="5" className="p-20 text-center text-gray-300 font-black uppercase text-xs tracking-widest">Немає запланованих робіт</td></tr>
+                        ) : (
+                            maintenance.sort((a,b) => new Date(a.date) - new Date(b.date)).map(task => (
+                                <tr key={task.id} className="hover:bg-gray-50/30 transition-colors">
+                                    <td className="p-6 font-black text-gray-900 text-sm italic">{new Date(task.date).toLocaleDateString('uk-UA')}</td>
+                                    <td className="p-6">
+                                        <div className="font-[950] text-gray-800 text-sm">{task.complexName}</div>
+                                        <div className="text-[10px] text-gray-400 font-black uppercase mt-1">{task.title}</div>
+                                    </td>
+                                    <td className="p-6">
+                                        <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-[9px] font-black uppercase">{task.type}</span>
+                                    </td>
+                                    <td className="p-6">{getStatusBadge(task.date, task.status)}</td>
+                                    <td className="p-6 text-center">
+                                        <button 
+                                            onClick={() => handleToggleStatus(task)}
+                                            className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${task.status === 'completed' ? 'bg-gray-50 text-gray-400 hover:text-red-500' : 'bg-brand-main text-white shadow-lg shadow-brand-main/20'}`}
+                                        >
+                                            {task.status === 'completed' ? '↩ Скасувати' : 'Виконано'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {showModal && (
+                <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-md flex items-center justify-center z-[150] p-6">
+                    <div className="bg-white rounded-[40px] w-full max-w-md p-10 shadow-2xl scale-in">
+                        <h2 className="text-2xl font-[950] mb-8 uppercase tracking-tighter text-gray-900 border-b pb-4">Нова задача</h2>
+                        <form onSubmit={handleAddTask} className="space-y-6">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Назва робіт</label>
+                                <input name="title" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 focus:ring-brand-main/20" required />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">ЖК</label>
+                                <select name="complexId" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm">
+                                    {complexes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Дата</label>
+                                    <input name="date" type="date" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" required />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Тип</label>
+                                    <select name="type" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm">
+                                        <option value="Електрика">⚡️ Електрика</option>
+                                        <option value="Сантехніка">🚰 Сантехніка</option>
+                                        <option value="Клінінг">🧹 Клінінг</option>
+                                        <option value="Садівництво">🌳 Садівництво</option>
+                                        <option value="Ліфти">🛗 Ліфти</option>
+                                        <option value="Інше">🛠 Інше</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="flex gap-4 pt-4">
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400 hover:text-gray-600">Закрити</button>
+                                <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Зберегти</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 // ---ПЕРСОНАЛ---
 const StaffView = ({ users, shifts, logs, createUser, deleteUser, onUpdateProfile, currentUser, deleteShift, editShift }) => {
 const [staffTab, setStaffTab] = useState('list');
@@ -311,7 +463,22 @@ return (
 {/* СПИСОК ПРАЦІВНИКІВ */}
 {staffTab === 'list' && (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {users.map((u) => (
+        {users
+            .slice() // Створюємо копію масиву перед сортуванням
+            .sort((a, b) => {
+                const rolePriority = {
+                    'Адмін': 1,
+                    'Директор': 2,
+                    'Менеджер': 3,
+                    'Бухгалтер': 4,
+                    'Виконроб': 5,
+                    'Електрик': 6,
+                    'Сантехнік': 7,
+                    'Прибиральник': 8
+                };
+                return (rolePriority[a.role] || 99) - (rolePriority[b.role] || 99);
+            })
+            .map((u) => (
             <div key={u.id} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group relative">
                 {/* Кнопки редагування / видалення */}
                 <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
@@ -369,34 +536,75 @@ return (
 {/* МОДАЛЬНЕ ВІКНО СТВОРЕННЯ/РЕДАГУВАННЯ */}
 {(showUserModal || editingUser) && (
     <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-md flex items-center justify-center z-[110] p-6">
-        <div className="bg-white rounded-[40px] w-full max-w-md p-10 fade-in shadow-2xl">
+        <div className="bg-white rounded-[40px] w-full max-w-md p-10 fade-in shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-black mb-6 uppercase tracking-tight">
                 {editingUser ? 'Редагувати дані' : 'Новий працівник'}
             </h2>
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
                     e.preventDefault();
                     const fd = new FormData(e.target);
+                    
+                    // Обробка фото (перетворення в Base64)
+                    let avatarBase64 = editingUser?.avatar || null;
+                    const fileInput = e.target.avatarFile;
+                    if (fileInput.files && fileInput.files[0]) {
+                        const file = fileInput.files[0];
+                        avatarBase64 = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.readAsDataURL(file);
+                        });
+                    }
+
                     const userData = {
                         id: editingUser ? editingUser.id : Date.now(),
                         name: fd.get('name'),
                         email: fd.get('email'),
                         phone: fd.get('phone'),
-                        birthday: fd.get('birthday'), // Додаємо збір дати
+                        birthday: fd.get('birthday'),
                         role: fd.get('role') || (editingUser ? editingUser.role : 'worker'),
+                        avatar: avatarBase64 // Зберігаємо нове або старе фото
                     };
 
                     if (!editingUser) {
                         userData.password = fd.get('pass');
-                        userData.avatar = null;
                         createUser(userData);
                         setShowUserModal(false);
                     } else {
-                        userData.avatar = editingUser.avatar; // Зберігаємо старий аватар
                         onUpdateProfile(userData);
                         setEditingUser(null);
                     }
                 }}
                 className="space-y-4">
+                
+                {/* ЗАВАНТАЖЕННЯ ФОТО */}
+                <div className="flex flex-col items-center gap-4 mb-6">
+                    <div className="relative group">
+                        <img 
+                            id="preview"
+                            src={editingUser?.avatar || 'https://via.placeholder.com/150'} 
+                            className="w-24 h-24 rounded-[35px] object-cover ring-4 ring-gray-50 shadow-md"
+                            alt="Preview"
+                        />
+                        <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-[35px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-[10px] font-black uppercase">
+                            Змінити
+                            <input 
+                                type="file" 
+                                name="avatarFile" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => {
+                                    if(e.target.files[0]) {
+                                        const url = URL.createObjectURL(e.target.files[0]);
+                                        document.getElementById('preview').src = url;
+                                    }
+                                }}
+                            />
+                        </label>
+                    </div>
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Фото працівника</p>
+                </div>
+
                 {/* ПІБ */}
                 <div className="space-y-1">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1"> ПІБ </label>
@@ -404,63 +612,38 @@ return (
                         name="name"
                         defaultValue={editingUser?.name}
                         placeholder="ПІБ"
-                        className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold"
+                        className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm"
                         required />
                 </div>
-                {/* Дата народження */}
+
+                {/* Решта полів залишається без змін */}
                 <div className="space-y-1">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                        Дата народження
-                    </label>
-                    <input
-                        name="birthday"
-                        type="date"
-                        defaultValue={editingUser?.birthday}
-                        className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" />
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Дата народження</label>
+                    <input name="birthday" type="date" defaultValue={editingUser?.birthday} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" />
                 </div>
-                {/* Email та Телефон */}
+
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                            Email
-                        </label>
-                        <input
-                            name="email"
-                            type="email"
-                            defaultValue={editingUser?.email}
-                            placeholder="Email"
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold"
-                            required />
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email</label>
+                        <input name="email" type="email" defaultValue={editingUser?.email} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" required />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1"> Телефон </label>
-                        <input
-                            name="phone"
-                            defaultValue={editingUser?.phone}
-                            placeholder="Телефон"
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold" />
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Телефон</label>
+                        <input name="phone" defaultValue={editingUser?.phone} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" />
                     </div>
                 </div>
-                {/* Пароль (тільки для нового користувача) */}
+
                 {!editingUser && (
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1"> Пароль </label>
-                        <input
-                            name="pass"
-                            type="password"
-                            placeholder="Пароль"
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold"
-                            required />
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Пароль</label>
+                        <input name="pass" type="password" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" required />
                     </div>
                 )}
-                {/* Роль */}
+
                 <div className="space-y-1">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1"> Роль</label>
                     {(currentUser.role === 'admin' || currentUser.role === 'Адмін' || currentUser.role === 'Директор') ? (
-                        <select
-                            name="role"
-                            defaultValue={editingUser?.role || 'Електрик'}
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold outline-none focus:ring-2 ring-brand-main">
+                        <select name="role" defaultValue={editingUser?.role || 'Електрик'} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm outline-none">
                             <option value="Адмін">Адміністратор</option>
                             <option value="Директор">Директор</option>
                             <option value="Менеджер">Менеджер</option>
@@ -471,28 +654,16 @@ return (
                             <option value="Прибиральник">Прибиральник(-ця)</option>
                         </select>
                     ) : (
-                        <div className="p-4 bg-gray-100 rounded-2xl text-gray-500 font-bold italic">
+                        <div className="p-4 bg-gray-100 rounded-2xl text-gray-500 font-bold italic text-sm">
                             {editingUser?.role || 'Працівник'}
-                            <input
-                                type="hidden"
-                                name="role"
-                                value={editingUser?.role || 'Працівник'} />
+                            <input type="hidden" name="role" value={editingUser?.role || 'Працівник'} />
                         </div>
                     )}
                 </div>
-                {/* Кнопки Скасувати / Зберегти */}
+
                 <div className="flex gap-3 pt-4">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setShowUserModal(false);
-                            setEditingUser(null);
-                        }}
-                        className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400">
-                        Скасувати
-                    </button>
-                    <button type="submit"
-                        className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">
+                    <button type="button" onClick={() => { setShowUserModal(false); setEditingUser(null); }} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400">Скасувати</button>
+                    <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">
                         {editingUser ? 'Зберегти' : 'Створити'}
                     </button>
                 </div>
@@ -624,6 +795,7 @@ return (
 			const [showShiftModal, setShowShiftModal] = useState(false);
             const [shiftMode, setShiftMode] = React.useState('single'); 
             const [editingShift, setEditingShift] = React.useState(null);
+            const [maintenance, setMaintenance] = useState([]);
            useEffect(() => {
     const connectToServer = async () => {
         try {
@@ -681,6 +853,7 @@ return (
                         if (data.logs) setLogs(data.logs);
                         if (data.archiveTasks) setArchiveTasks(data.archiveTasks);
 						if (data.complexes) setComplexes(data.complexes);
+                        if (data.maintenance) setMaintenance(data.maintenance);
                     })
                     .catch(err => console.error("Помилка завантаження даних:", err));
             }, []);
@@ -886,16 +1059,17 @@ return (
                 </div>
             </div>
 
-{/* НАВІГАЦІЯ */}
-<nav className="flex-1 space-y-2 lg:space-y-3">
+{/* НАВІГАЦІЯ - Додано overflow-y-auto та зменшено відступи */}
+<nav className="flex-1 space-y-1 lg:space-y-1.5 overflow-y-auto pr-2 custom-scrollbar">
     {[
-       { id: 'dashboard', label: 'Дашборд', icon: 'M3 12l2-2 7-7 7 7 2 2v8a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-8z' },
-       { id: 'kanban', label: 'Дошка задач', icon: 'M4 4a2 2 0 012-2h12a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 4h2v8H7V8zm4 2h2v6h-2v-6zm4-1h2v7h-2V9z' },
-       { id: 'inventory', label: 'Матеріали', icon: 'M3 7l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v7l-9 4-9-4v-7z' },
-       { id: 'staff', label: 'Команда', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M9 11a4 4 0 100-8 4 4 0 000 8zm0 2c-3.314 0-6 1.686-6 4v3h12v-3c0-2.314-2.686-4-6-4z' },
-       { id: 'complexes', label: 'Комплекси', icon: 'M4 21V5a2 2 0 012-2h4v18H4zm6 0V3h4v18h-4zm6 0V8h4v13h-4z' },
-       { id: 'archive', label: 'Архів', icon: 'M3 7a2 2 0 012-2h14a2 2 0 012 2v2H3V7zm2 4h14v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-8zm5 2h4v4h-4v-4z' },
-       { id: 'profile', label: 'Мій кабінет', icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z' }
+        { id: 'dashboard', label: 'Дашборд', icon: 'M3 12l2-2 7-7 7 7 2 2v8a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-8z' },
+        { id: 'kanban', label: 'Дошка задач', icon: 'M4 4a2 2 0 012-2h12a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 4h2v8H7V8zm4 2h2v6h-2v-6zm4-1h2v7h-2V9z' },
+        { id: 'maintenance', label: 'Календар ТО', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'},
+        { id: 'inventory', label: 'Матеріали', icon: 'M3 7l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v7l-9 4-9-4v-7z' },
+        { id: 'staff', label: 'Команда', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M9 11a4 4 0 100-8 4 4 0 000 8zm0 2c-3.314 0-6 1.686-6 4v3h12v-3c0-2.314-2.686-4-6-4z' },
+        { id: 'complexes', label: 'Комплекси', icon: 'M4 21V5a2 2 0 012-2h4v18H4zm6 0V3h4v18h-4zm6 0V8h4v13h-4z' },
+        { id: 'archive', label: 'Архів', icon: 'M3 7a2 2 0 012-2h14a2 2 0 012 2v2H3V7zm2 4h14v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-8zm5 2h4v4h-4v-4z' },
+        { id: 'profile', label: 'Мій кабінет', icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z' }
     ].map(item => (
         <button 
             key={item.id}
@@ -903,16 +1077,22 @@ return (
                 setActiveTab(item.id);
                 setIsMobileMenuOpen(false);
             }}
-            className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-black text-xs uppercase tracking-[0.15em] ${activeTab === item.id ? 'bg-white/10 text-white shadow-inner' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            className={`w-full flex items-center gap-4 px-6 py-3 rounded-2xl transition-all font-black text-[10px] uppercase tracking-[0.12em] ${activeTab === item.id ? 'bg-white/10 text-white shadow-inner' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
         >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={item.icon}/>
             </svg>
-            {item.label}
+            <span className="truncate">{item.label}</span>
         </button>
     ))}
 </nav>
 
+{/* CSS для гарного прихованого скроллу */}
+<style>{`
+    .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+`}</style>
 {/* ПРОФІЛЬ ВНИЗУ */}
             <div className="mt-auto pt-10">
                 <div className="bg-black/30 p-5 rounded-[30px] border border-white/5 flex items-center gap-4">
@@ -969,26 +1149,29 @@ return (
                         <div className="flex-1 overflow-y-auto p-12 custom-scroll">
       {activeTab === 'dashboard' && (
     <div className="space-y-10 fade-in pb-12">
-        {/* КАРТКИ СТАТИСТИКИ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-                { label: 'Заявки', val: tasks.length, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2', col: 'blue', desc: 'Всього в базі' },
-                { label: 'В роботі', val: tasks.filter(t => t.status === 'in-progress').length, icon: 'M13 10V3L4 14h7v7l9-11h-7z', col: 'amber', desc: 'Активні зараз' },
-                { label: 'Склад', val: inventory.length, icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', col: 'red', desc: 'Одиниць товару' },
-                { label: 'Команда', val: users.length, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', col: 'green', desc: 'Працівників' }
-            ].map(s => (
-                <div key={s.label} className="bg-white p-8 rounded-[48px] shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                    <div className={`w-14 h-14 rounded-2xl bg-${s.col}-50 text-${s.col}-500 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform`}>
-                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={s.icon}/></svg>
-                    </div>
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{s.label}</div>
-                    <div className="flex items-baseline gap-2">
-                        <div className="text-4xl font-[950] text-gray-900 mt-2">{s.val}</div>
-                        <div className="text-[10px] font-bold text-gray-300 lowercase">{s.desc}</div>
-                    </div>
-                </div>
-            ))}
+        {/* КАРТКИ СТАТИСТИКИ — 5 КАРТОК В РЯД */}
+<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+    {[
+        { label: 'Заявки', val: tasks.length, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2', col: 'blue', desc: 'всього' },
+        { label: 'В роботі', val: tasks.filter(t => t.status === 'in-progress').length, icon: 'M13 10V3L4 14h7v7l9-11h-7z', col: 'amber', desc: 'активні' },
+        { label: 'Об\'єкти', val: complexes.length, icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5', col: 'purple', desc: 'комплексів' },
+        { label: 'Склад', val: inventory.length, icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', col: 'red', desc: 'одиниць' },
+        { label: 'Команда', val: users.length, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', col: 'green', desc: 'людей' }
+    ].map(s => (
+        <div key={s.label} className="bg-white p-5 lg:p-6 rounded-[32px] shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group">
+            <div className={`w-10 h-10 rounded-xl bg-${s.col}-50 text-${s.col}-500 flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={s.icon}/>
+                </svg>
+            </div>
+            <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{s.label}</div>
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+                <div className="text-2xl font-[950] text-gray-900 mt-1">{s.val}</div>
+                <div className="text-[9px] font-bold text-gray-300 lowercase leading-tight">{s.desc}</div>
+            </div>
         </div>
+    ))}
+</div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
     {/* ОСТАННІ ДІЇ */}
@@ -1105,7 +1288,7 @@ return (
                 <div className="flex items-center gap-4">
                     <div className="bg-gray-900 text-white w-12 h-12 rounded-[20px] flex items-center justify-center font-black text-xl shadow-lg">HT</div>
                     <div>
-                        <h4 className="font-black text-gray-900 leading-none mb-1">Home Team CRM</h4>
+                        <h4 className="font-black text-gray-900 leading-none mb-1">Home Team</h4>
                         <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Спеціально для "Укр Житло Сервіс"</p>
                     </div>
                 </div>
@@ -1232,8 +1415,16 @@ return (
     // 2. Сортуємо назви міст за алфавітом
     const sortedCities = Object.keys(groupedComplexes).sort((a, b) => a.localeCompare('uk'));
 
+    // Перевірка прав доступу (Адмін або Директор)
+    const hasFullAccess = currentUser.role === 'Адмін' || currentUser.role === 'Директор';
+
     // Функція для редагування
     const handleEdit = (cx) => {
+        if (!hasFullAccess) {
+            alert("У вас немає прав для редагування об'єктів");
+            return;
+        }
+        
         const newName = prompt("Назва ЖК:", cx.name);
         const newCity = prompt("Місто:", cx.city);
         const newAddr = prompt("Адреса:", cx.address);
@@ -1263,28 +1454,32 @@ return (
                     <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">База об'єктів (ЖК)</h2>
                     <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-2">Групування за територіальними громадами</p>
                 </div>
-                <button 
-                    onClick={() => {
-                        const rawName = prompt("Назва ЖК:");
-                        const rawCity = prompt("Місто:", "Київ");
-                        const addr = prompt("Адреса:");
-                        const head = prompt("ПІБ Голови ОСББ:");
+                
+                {/* Кнопка додавання доступна ТІЛЬКИ адміну/директору */}
+                {hasFullAccess && (
+                    <button 
+                        onClick={() => {
+                            const rawName = prompt("Назва ЖК:");
+                            const rawCity = prompt("Місто:", "Київ");
+                            const addr = prompt("Адреса:");
+                            const head = prompt("ПІБ Голови ОСББ:");
 
-                        if (rawName && rawCity) {
-                            const name = rawName.trim();
-                            const cityTrimmed = rawCity.trim();
-                            const city = cityTrimmed.charAt(0).toUpperCase() + cityTrimmed.slice(1).toLowerCase();
-                            const newCx = { id: Date.now(), name, city, address: addr?.trim() || '', headName: head?.trim() || 'Не вказано' };
-                            const updated = [...complexes, newCx];
-                            setComplexes(updated);
-                            saveToServer({ complexes: updated });
-                            addLog('Комплекси', `Додано новий об'єкт: ${name} (${city})`);
-                        }
-                    }}
-                    className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all"
-                >
-                    + Додати об'єкт
-                </button>
+                            if (rawName && rawCity) {
+                                const name = rawName.trim();
+                                const cityTrimmed = rawCity.trim();
+                                const city = cityTrimmed.charAt(0).toUpperCase() + cityTrimmed.slice(1).toLowerCase();
+                                const newCx = { id: Date.now(), name, city, address: addr?.trim() || '', headName: head?.trim() || 'Не вказано' };
+                                const updated = [...complexes, newCx];
+                                setComplexes(updated);
+                                saveToServer({ complexes: updated });
+                                addLog('Комплекси', `Додано новий об'єкт: ${name} (${city})`);
+                            }
+                        }}
+                        className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all"
+                    >
+                        + Додати об'єкт
+                    </button>
+                )}
             </div>
 
             {complexes.length === 0 ? (
@@ -1309,30 +1504,33 @@ return (
                                 <div key={cx.id} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group hover:shadow-md transition-all relative overflow-hidden">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl shadow-inner">🏢</div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                            {/* Кнопка РЕДАГУВАННЯ */}
-                                            <button 
-                                                onClick={() => handleEdit(cx)}
-                                                className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"
-                                                title="Редагувати"
-                                            >
-                                                ✎
-                                            </button>
-                                            {/* Кнопка ВИДАЛЕННЯ */}
-                                            <button 
-                                                onClick={() => {
-                                                    if(confirm(`Видалити ${cx.name}?`)) {
-                                                        const updated = complexes.filter(c => c.id !== cx.id);
-                                                        setComplexes(updated);
-                                                        saveToServer({ complexes: updated });
-                                                        addLog('Комплекси', `Видалено об'єкт: ${cx.name}`);
-                                                    }
-                                                }}
-                                                className="w-8 h-8 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
-                                            >
-                                                ✕
-                                            </button>
-                                        </div>
+                                        
+                                        {/* Блок кнопок управління (показуємо лише Адміну/Директору) */}
+                                        {hasFullAccess && (
+                                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button 
+                                                    onClick={() => handleEdit(cx)}
+                                                    className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"
+                                                    title="Редагувати"
+                                                >
+                                                    ✎
+                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        if(confirm(`Видалити ${cx.name}?`)) {
+                                                            const updated = complexes.filter(c => c.id !== cx.id);
+                                                            setComplexes(updated);
+                                                            saveToServer({ complexes: updated });
+                                                            addLog('Комплекси', `Видалено об'єкт: ${cx.name}`);
+                                                        }
+                                                    }}
+                                                    className="w-8 h-8 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
+                                                    title="Видалити"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                     
                                     <h3 className="font-[950] text-gray-900 text-xl mb-1 leading-tight">{cx.name}</h3>
@@ -1365,6 +1563,17 @@ return (
         </div>
     );
 })()}
+
+{activeTab === 'maintenance' && (
+    <MaintenanceView 
+        complexes={complexes}
+        maintenance={maintenance}      // Передаємо стан
+        setMaintenance={setMaintenance} // Передаємо функцію зміни
+        saveToServer={saveToServer} 
+        addLog={addLog}
+        currentUser={currentUser}
+    />
+)}
 {activeTab === 'inventory' && <InventoryView inventory={inventory} setInventory={setInventory} addLog={addLog} />}
                             
            {activeTab === 'staff' && (

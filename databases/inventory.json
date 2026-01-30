@@ -7,5 +7,626 @@
     "category": "Електрика",
     "minLimit": 5,
     "id": 1768148574443
+  },
+  {
+    "item": "Реле напруги",
+    "model": "Zubr D2-40",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768232831728
+  },
+  {
+    "item": "Автоматичний вимикач",
+    "model": "Eaton 16A",
+    "quantity": 15,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768232865914
+  },
+  {
+    "item": "Світлодіодна панель 600x600 (40W)",
+    "model": "Videk",
+    "quantity": 13,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768232910110
+  },
+  {
+    "item": "Коробка розподільча зовнішня IP65",
+    "model": "Schneider Electric",
+    "quantity": 8,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 2,
+    "id": 1768232958769
+  },
+  {
+    "item": "Лампа LED E27 10W",
+    "model": "Philips",
+    "quantity": 40,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768232986379
+  },
+  {
+    "item": "Підрозетник для бетону (посилений)",
+    "model": "Hager",
+    "quantity": 21,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 10,
+    "id": 1768233020614
+  },
+  {
+    "item": "Розетка внутрішня",
+    "model": "Schneider Electric",
+    "quantity": 50,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 10,
+    "id": 1768233052383
+  },
+  {
+    "item": "Контактор модульний 25A",
+    "model": "IEK",
+    "quantity": 21,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768233146990
+  },
+  {
+    "item": "Індикаторна лампа на DIN-рейку (червона)",
+    "model": "Osram",
+    "quantity": 50,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 10,
+    "id": 1768233191889
+  },
+  {
+    "item": "Кран кульовий 1/2\" (зовнішня-внутрішня)",
+    "model": "Valtec",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233226748
+  },
+  {
+    "item": "Сифон для мийки з переливом",
+    "model": "Grohe",
+    "quantity": 6,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 1,
+    "id": 1768233293337
+  },
+  {
+    "item": "Труба поліпропіленова PPR 20мм (4м)",
+    "model": "Rehau",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233315610
+  },
+  {
+    "item": "Фум-стрічка (професійна)",
+    "model": "Hansgrohe",
+    "quantity": 47,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233358110
+  },
+  {
+    "item": "Американка 1/2\" пряма (латунь)",
+    "model": "Valtec",
+    "quantity": 8,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 3,
+    "id": 1768233439036
+  },
+  {
+    "item": "Американка 3/4\" кутова (нікель)",
+    "model": "Giacomini",
+    "quantity": 11,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233470430
+  },
+  {
+    "item": "Редуктор тиску (захист від гідроударів)",
+    "model": "Honeywell",
+    "quantity": 4,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 1,
+    "id": 1768233491903
+  },
+  {
+    "item": "Колба магістральна для холодної води",
+    "model": "Atlas Filtri",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233524585
+  },
+  {
+    "item": "Термоголовка для радіатора",
+    "model": "Danfoss",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233546779
+  },
+  {
+    "item": "Ущільнювальна паста (пакувальна)",
+    "model": "Unipak",
+    "quantity": 24,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 5,
+    "id": 1768233576686
+  },
+  {
+    "item": "Кран кульовий з ручкою «метелик» 1/2\"",
+    "model": "Bugatti",
+    "quantity": 13,
+    "unit": "шт",
+    "category": "Електрика",
+    "minLimit": 5,
+    "id": 1768233596847
+  },
+  {
+    "item": "Зворотний клапан для води 1\"",
+    "model": "Itap",
+    "quantity": 7,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 2,
+    "id": 1768233619176
+  },
+  {
+    "item": "Засіб для миття скляних поверхонь (Clar-Glass)",
+    "model": "Kiehl",
+    "quantity": 25,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233714256
+  },
+  {
+    "item": "Концентрат для підлоги (Floor Cleaner)",
+    "model": "Diversey",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233734376
+  },
+  {
+    "item": "Засіб для видалення жиру на кухні (Grill Express)",
+    "model": "Cif Pro",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233752529
+  },
+  {
+    "item": "Активна піна для чищення килимів",
+    "model": "Chemspec",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233769507
+  },
+  {
+    "item": "Моп мікроволоконний (MicroSpeed Plus)",
+    "model": "Vileda Professional",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 2,
+    "id": 1768233793517
+  },
+  {
+    "item": "Паперові рушники (Z-складання)",
+    "model": "Сніжна Панда",
+    "quantity": 30,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233814142
+  },
+  {
+    "item": "Мішки для сміття (надміцні, LDPE)",
+    "model": "Фрекен Бок",
+    "quantity": 30,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233835648
+  },
+  {
+    "item": "Тримач мопа (флаундер) 40 см",
+    "model": "Vileda Professional",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 1,
+    "id": 1768233864530
+  },
+  {
+    "item": "Мітла поліпропіленова \"Кругла\" (вулична)",
+    "model": "Intertool",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768233905245
+  },
+  {
+    "item": "Лопата для снігу пластикова (посилена з алюмінієвою кромкою)",
+    "model": "Fiskars",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 1,
+    "id": 1768233924182
+  },
+  {
+    "item": "Лопата штикова",
+    "model": "Fiskars",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768475805199
+  },
+  {
+    "item": "Граблі садові",
+    "model": "Gardena",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 5,
+    "id": 1768475848697
+  },
+  {
+    "item": "Секатор",
+    "model": "Felco",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768475902014
+  },
+  {
+    "item": "Поливальний шланг",
+    "model": "Hozelock",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768475930784
+  },
+  {
+    "item": "Ножиці для живоплоту",
+    "model": "Stihl",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768475948489
+  },
+  {
+    "item": "Перчатки садові",
+    "model": "Briers",
+    "quantity": 30,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 5,
+    "id": 1768475979028
+  },
+  {
+    "item": "Садові ножиці",
+    "model": "ARS",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476010238
+  },
+  {
+    "item": "Компостер",
+    "model": "Tierra Garden",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476054881
+  },
+  {
+    "item": "Газонокосарка",
+    "model": "Honda",
+    "quantity": 2,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476076163
+  },
+  {
+    "item": "Кущоріз",
+    "model": "Makita",
+    "quantity": 2,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476096750
+  },
+  {
+    "item": "Лійка",
+    "model": "Haws",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476127222
+  },
+  {
+    "item": "Садова тачка",
+    "model": "WORX",
+    "quantity": 2,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476158873
+  },
+  {
+    "item": "Ручки кулькові",
+    "model": "Flair",
+    "quantity": 35,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476183291
+  },
+  {
+    "item": "Маркери для дошки",
+    "model": "Axent",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476210629
+  },
+  {
+    "item": "Папір для принтера A4 (500 шт уп)",
+    "model": "Xerox",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476240119
+  },
+  {
+    "item": "Блокноти",
+    "model": "Economix",
+    "quantity": 20,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476255361
+  },
+  {
+    "item": "Степлер",
+    "model": "Rapid",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 2,
+    "id": 1768476272649
+  },
+  {
+    "item": "Скоби для степлера",
+    "model": "Economix",
+    "quantity": 25,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476289019
+  },
+  {
+    "item": "Ножиці канцелярські",
+    "model": "Fiskars",
+    "quantity": 7,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 2,
+    "id": 1768476314228
+  },
+  {
+    "item": "Клейова стрічка",
+    "model": "Belt",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 3,
+    "id": 1768476333958
+  },
+  {
+    "item": "Канцелярські кнопки (100 шт. уп.)",
+    "model": "Axent",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476366576
+  },
+  {
+    "item": "Калькулятор",
+    "model": "Casio",
+    "quantity": 5,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 1,
+    "id": 1768476390994
+  },
+  {
+    "item": "Папки для документів",
+    "model": "Esselte",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476423509
+  },
+  {
+    "item": "Підставка для ручок",
+    "model": "CEP",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Офісне приладдя",
+    "minLimit": 5,
+    "id": 1768476436877
+  },
+  {
+    "item": "Пилосос комерційний",
+    "model": "Dyson",
+    "quantity": 2,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476459223
+  },
+  {
+    "item": "Відро пластикове",
+    "model": "Vileda",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 5,
+    "id": 1768476488065
+  },
+  {
+    "item": "Вогнегасник",
+    "model": "Kidde",
+    "quantity": 3,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476506266
+  },
+  {
+    "item": "Кавоварка офісна",
+    "model": "Philips",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476526540
+  },
+  {
+    "item": "Чайник електричний",
+    "model": "Gorenje",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476539957
+  },
+  {
+    "item": "Датчик руху",
+    "model": "Philips Hue",
+    "quantity": 4,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476581520
+  },
+  {
+    "item": "Мультимедійний проектор",
+    "model": "Epson",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476599249
+  },
+  {
+    "item": "Бензиновий генератор",
+    "model": "Дніпро М",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476656558
+  },
+  {
+    "item": "Водяний насос",
+    "model": "Gardena",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Сантехніка",
+    "minLimit": 1,
+    "id": 1768476673471
+  },
+  {
+    "item": "Мийка високого тиску",
+    "model": "Kärcher",
+    "quantity": 2,
+    "unit": "шт",
+    "category": "Клінінг",
+    "minLimit": 1,
+    "id": 1768476688976
+  },
+  {
+    "item": "Драбина алюмінієва висока",
+    "model": "Werner",
+    "quantity": 3,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476705297
+  },
+  {
+    "item": "Електрична газонокосарка",
+    "model": "Bosch",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Садівництво",
+    "minLimit": 1,
+    "id": 1768476753876
+  },
+  {
+    "item": "Трактор для очистки снігу",
+    "model": "Husqvarna",
+    "quantity": 1,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 1,
+    "id": 1768476793425
+  },
+  {
+    "item": "Дизель ",
+    "model": "10л каністра",
+    "quantity": 10,
+    "unit": "шт",
+    "category": "Інше",
+    "minLimit": 2,
+    "id": 1768647500822
   }
 ]

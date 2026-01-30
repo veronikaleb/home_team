@@ -13,11 +13,12 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-// Шляхи до файлів
+// --- Шляхи до файлів ---
 const DB_PATH = path.join(__dirname, 'databases/db.json');
 const USERS_PATH = path.join(__dirname, 'databases/users.json');
 const LOGS_PATH = path.join(__dirname, 'databases/logs.json');
-const INVENTORY_PATH = path.join(__dirname, 'databases/inventory.json'); // НОВИЙ ШЛЯХ
+const INVENTORY_PATH = path.join(__dirname, 'databases/inventory.json');
+const MAINTENANCE_PATH = path.join(__dirname, 'databases/maintenance.json'); // НОВИЙ ШЛЯХ
 
 // Перевірка і створення необхідних папок
 const dirs = [path.join(__dirname, 'images'), path.join(__dirname, 'databases')];
@@ -58,18 +59,23 @@ app.post('/api/upload', upload.single('avatar'), (req, res) => {
 // --- API роути ---
 
 app.get('/api/data', (req, res) => {
+    // Читаємо всі файли окремо
     const dbData = readJSON(DB_PATH) || {};
     const usersData = readJSON(USERS_PATH) || [];
     const logsData = readJSON(LOGS_PATH) || [];
-    const inventoryData = readJSON(INVENTORY_PATH) || []; // Читаємо окремий файл складу
+    const inventoryData = readJSON(INVENTORY_PATH) || [];
+    const maintenanceData = readJSON(MAINTENANCE_PATH) || []; // Читаємо ТО
 
     const fullData = { 
-        tasks: [], shifts: [], 
-        archiveTasks: [], complexes: [], 
+        tasks: [], 
+        shifts: [], 
+        archiveTasks: [], 
+        complexes: [], 
         ...dbData, 
         users: usersData,
         logs: logsData,
-        inventory: inventoryData // Віддаємо дані складу фронтенду
+        inventory: inventoryData,
+        maintenance: maintenanceData // Передаємо масив ТО на фронтенд
     };
     res.json(fullData);
 });
@@ -87,12 +93,17 @@ app.post('/api/save', (req, res) => {
         fs.writeFileSync(LOGS_PATH, JSON.stringify(incomingData.logs, null, 2));
     }
 
-    // 3. НОВЕ: Збереження складу в inventory.json
+    // 3. Збереження складу
     if (incomingData.inventory) {
         fs.writeFileSync(INVENTORY_PATH, JSON.stringify(incomingData.inventory, null, 2));
     }
 
-    // 4. Збереження решти даних в db.json (ВИКЛЮЧАЄМО inventory)
+    // 4. НОВЕ: Збереження Технічного Обслуговування (ТО)
+    if (incomingData.maintenance) {
+        fs.writeFileSync(MAINTENANCE_PATH, JSON.stringify(incomingData.maintenance, null, 2));
+    }
+
+    // 5. Збереження решти даних в db.json (задачі, зміни, комплекси)
     const keysToSaveToDB = ['tasks', 'shifts', 'archiveTasks', 'complexes'];
     let dbData = readJSON(DB_PATH) || {};
     let dbChanged = false;
@@ -112,5 +123,7 @@ app.post('/api/save', (req, res) => {
 });
 
 app.listen(3000, () => {
-    console.log('SERVER RUNNING on http://localhost:3000');
+    console.log('--- SERVER RUNNING ---');
+    console.log('URL: http://localhost:3000');
+    console.log('Database path:', path.join(__dirname, 'databases'));
 });
