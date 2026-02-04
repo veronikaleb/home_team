@@ -34,9 +34,9 @@
         const API_URL = 'http://localhost:3000/api';
         const AUTO_LOGOUT_TIME = 120 * 60 * 1000; 
         const hashPass = (p) => `hash_${p}`;
-		// --- логін ---
-      const LoginScreen = ({ onLogin, users }) => {
-    // Встановлюємо порожні рядки, щоб користувач вводив дані власноруч
+
+// ======= Login page =======
+    const LoginScreen = ({ onLogin, users }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
     const [error, setError] = useState('');
@@ -58,15 +58,12 @@
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-brand-dark p-6 grid-bg relative overflow-hidden">
-            {/* Фонове сяйво (ефект рідкого скла) */}
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[300px] bg-brand-main/20 blur-[100px] rounded-full -z-10 animate-pulse-slow"></div>
-<div className="glass p-8 lg:p-12 rounded-[50px] w-full max-w-md fade-in relative overflow-hidden shadow-2xl border border-white/10">
-    <a href="site.html" className="absolute top-8 left-8 text-white/30 hover:text-white transition-all flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] group">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[300px] bg-brand-main/20 blur-[100px] rounded-full -z-10 animate-pulse-slow"></div>
+        <div className="glass p-8 lg:p-12 rounded-[50px] w-full max-w-md fade-in relative overflow-hidden shadow-2xl border border-white/10">
+        <a href="site.html" className="absolute top-8 left-8 text-white/30 hover:text-white transition-all flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] group">
         <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Назад
-    </a>
+        </svg> Назад </a>
 
     <div className="text-center mt-6">
         <div className="mb-3 inline-block p-5 bg-[#0566C7] rounded-[28px] shadow-lg shadow-blue-900/40 transform transition-transform hover:scale-105">
@@ -81,9 +78,7 @@
                 <span className="italic text-white">Home</span>
                 <span className="italic ml-2 text-[#0566C7]">Team</span>
             </h2>
-            <span className="text-[10px] font-black text-white/40 tracking-[0.4em] uppercase mt-1.5 whitespace-nowrap">
-                Service Platform
-            </span>
+            <span className="text-[10px] font-black text-white/40 tracking-[0.4em] uppercase mt-1.5 whitespace-nowrap"> Service Platform </span>
         </div>
         <p className="text-white font-bold mb-6 uppercase text-[15px] tracking-[0.3em]">Вхід</p>
         
@@ -101,8 +96,7 @@
                     onChange={e => setEmail(e.target.value)}
                     className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl focus:border-[#0566C7] focus:bg-white/10 outline-none transition-all font-bold text-white placeholder-white/20 text-sm"
                     placeholder="E-MAIL" 
-                    required 
-                />
+                    required />
             </div>
             
             <div className="relative group">
@@ -112,8 +106,7 @@
                     onChange={e => setPassword(e.target.value)}
                     className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl focus:border-[#0566C7] focus:bg-white/10 outline-none transition-all font-bold text-white placeholder-white/20 text-sm"
                     placeholder="ПАРОЛЬ" 
-                    required 
-                />
+                    required />
             </div>
             
             <button className="w-full bg-[#0566C7] text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-900/40 hover:bg-blue-600 transition-all active:scale-95 text-[11px] uppercase tracking-[0.2em] mt-4">
@@ -122,8 +115,6 @@
         </form>
     </div>
 </div>
-
-            {/* Футер логін-сторінки */}
             <footer className="mt-16 text-center select-none">
                 <p className="text-[10px] font-black italic text-white/90 uppercase tracking-tighter">
                     Developed for <span className="text-white">Ukr Zhytlo Service</span>
@@ -136,6 +127,7 @@
     );
 };
 
+// ======= Inventory page =======
 const InventoryView = ({ inventory, setInventory, addLog }) => {
     const [newItem, setNewItem] = React.useState({
         item: '',
@@ -143,17 +135,14 @@ const InventoryView = ({ inventory, setInventory, addLog }) => {
         quantity: 0,
         unit: 'шт',
         category: 'Інше',
-        minLimit: 5 // Поріг для критичного залишку
+        minLimit: 5 
     });
-
     const categories = ['Електрика', 'Сантехніка', 'Клінінг', 'Садівництво', 'Офісне приладдя', 'Інше'];
-
     const addItem = () => {
         if (!newItem.item || !newItem.model) {
             alert("Заповніть назву та модель!");
             return;
         }
-
         const updated = [
             ...inventory,
             {
@@ -167,28 +156,23 @@ const InventoryView = ({ inventory, setInventory, addLog }) => {
         addLog('Склад', `Додано: ${newItem.category} - ${newItem.item} (${newItem.model})`);
         setNewItem({ item: '', model: '', quantity: 0, unit: 'шт', category: 'Інше', minLimit: 5 });
     };
-
     const updateQty = (id, val) => {
         const updated = inventory.map(i =>
             i.id === id ? { ...i, quantity: Math.max(0, parseInt(val) || 0) } : i
         );
         setInventory(updated);
     };
-
     const removeItem = (id, name) => {
         if (confirm(`Видалити ${name}?`)) {
             setInventory(inventory.filter(i => i.id !== id));
             addLog('Склад', `Видалено матеріал: ${name}`);
         }
     };
-
-    // Функція визначення статусу залишку
     const getStockStatus = (qty, min) => {
         if (qty <= 0) return { label: 'Відсутньо', color: 'bg-red-500', text: 'text-red-600' };
         if (qty < min) return { label: 'Критично', color: 'bg-amber-500', text: 'text-amber-600' };
         return { label: 'Достатньо', color: 'bg-green-500', text: 'text-green-600' };
     };
-
     const groupedInventory = inventory.reduce((acc, item) => {
         const cat = item.category || 'Інше';
         if (!acc[cat]) acc[cat] = [];
@@ -198,7 +182,7 @@ const InventoryView = ({ inventory, setInventory, addLog }) => {
 
     return (
         <div className="fade-in">
-            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">📦 Управління складом</h2>
+            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">📦 Додати матеріали</h2>
             
             <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 mb-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
@@ -285,32 +269,33 @@ const InventoryView = ({ inventory, setInventory, addLog }) => {
         </div>
     );
 };
-// календар
-const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer, addLog, currentUser }) => {
+ 
+// ======= Calendar page =======
+const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer, addLog, currentUser, setArchiveTasks }) => {
     const [showModal, setShowModal] = useState(false);
+    const [editingMaint, setEditingMaint] = useState(null);
 
-   const syncWithFile = async (updatedList) => {
-        // 1. Оновлюємо стан в пам'яті (щоб зразу бачити зміни в інтерфейсі)
+    // Перевірка прав: Адмін або Директор
+    const isPrivileged = currentUser?.role === 'admin' || 
+                        currentUser?.role === 'Admin' || 
+                        currentUser?.role === 'Директор' || 
+                        currentUser?.id === 1;
+
+    const syncWithFile = async (updatedList) => {
         setMaintenance(updatedList);
-        
-        // 2. Відправляємо на сервер у форматі { maintenance: [...] }
         try {
-            // Викликаємо загальну функцію збереження, передаючи ключ maintenance
-            // Це змусить сервер оновити файл databases/maintenance.json
             await saveToServer({ maintenance: updatedList });
-            console.log("Календар ТО синхронізовано з сервером");
         } catch (error) {
             console.error("Помилка при збереженні ТО:", error);
-            alert("Помилка збереження календаря!");
         }
     };
+
     const getStatusBadge = (dateStr, status) => {
         if (status === 'completed') return <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Виконано</span>;
         const today = new Date();
         today.setHours(0,0,0,0);
         const taskDate = new Date(dateStr);
         const diffDays = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
-
         if (diffDays < 0) return <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Протерміновано</span>;
         if (diffDays <= 3) return <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black animate-pulse uppercase tracking-tighter">Увага: {diffDays === 0 ? 'сьогодні' : `через ${diffDays} дн.`}</span>;
         return <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Заплановано</span>;
@@ -318,8 +303,9 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
 
     const handleAddTask = (e) => {
         e.preventDefault();
-        const fd = new FormData(e.target);
+        if (!isPrivileged) return alert("Недостатньо прав");
         
+        const fd = new FormData(e.target);
         const newTask = {
             id: Date.now(),
             title: fd.get('title'),
@@ -329,11 +315,43 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
             type: fd.get('type'),
             status: 'planned'
         };
-
-        const updated = [...maintenance, newTask];
-        syncWithFile(updated); 
+        syncWithFile([...maintenance, newTask]); 
         addLog('ТО', `Додано: ${newTask.title}`);
         setShowModal(false);
+    };
+
+    const handleEditTask = (e) => {
+        e.preventDefault();
+        if (!isPrivileged) return;
+
+        const fd = new FormData(e.target);
+        const updated = maintenance.map(t => t.id === editingMaint.id ? {
+            ...t,
+            title: fd.get('title'),
+            complexId: fd.get('complexId'),
+            complexName: complexes.find(c => c.id.toString() === fd.get('complexId'))?.name || 'Обʼєкт',
+            date: fd.get('date'),
+            type: fd.get('type')
+        } : t);
+        
+        syncWithFile(updated);
+        addLog('ТО', `Відредаговано: ${fd.get('title')}`);
+        setEditingMaint(null);
+    };
+
+    const archiveMaintenance = (task) => {
+        if (!isPrivileged) return;
+        if (!confirm(`Перенести "${task.title}" в архів?`)) return;
+        
+        setArchiveTasks(prev => [...prev, { 
+            ...task, 
+            archivedAt: new Date().toISOString(),
+            source: 'maintenance'
+        }]);
+        
+        const updated = maintenance.filter(t => t.id !== task.id);
+        syncWithFile(updated);
+        addLog('ТО', `Перенесено в архів: ${task.title}`);
     };
 
     const handleToggleStatus = (task) => {
@@ -346,11 +364,14 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
     return (
         <div className="fade-in space-y-8 p-2">
             <div className="flex justify-between items-center px-4">
-                <div>
-                    <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">Технічне обслуговування</h2>
-                    <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 italic">База даних: maintenance.json</p>
-                </div>
-                <button onClick={() => setShowModal(true)} className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 transition-all">+ Запланувати ТО</button>
+                <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">Календар ТО</h2>
+                
+                {/* Кнопка створення тільки для Адміна/Директора */}
+                {isPrivileged && (
+                    <button onClick={() => setShowModal(true)} className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
+                        + Запланувати ТО
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
@@ -361,7 +382,7 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
                             <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Об'єкт та задача</th>
                             <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Тип</th>
                             <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Статус</th>
-                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Дії</th>
+                            <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Дії</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -379,13 +400,23 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
                                         <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-[9px] font-black uppercase">{task.type}</span>
                                     </td>
                                     <td className="p-6">{getStatusBadge(task.date, task.status)}</td>
-                                    <td className="p-6 text-center">
-                                        <button 
-                                            onClick={() => handleToggleStatus(task)}
-                                            className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${task.status === 'completed' ? 'bg-gray-50 text-gray-400 hover:text-red-500' : 'bg-brand-main text-white shadow-lg shadow-brand-main/20'}`}
-                                        >
-                                            {task.status === 'completed' ? '↩ Скасувати' : 'Виконано'}
-                                        </button>
+                                    <td className="p-6">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button 
+                                                onClick={() => handleToggleStatus(task)}
+                                                className={`px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${task.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-brand-main text-white'}`}
+                                            >
+                                                {task.status === 'completed' ? '✓' : 'Виконати'}
+                                            </button>
+                                            
+                                            {/* Дії доступні тільки для Адміна/Директора */}
+                                            {isPrivileged && (
+                                                <>
+                                                    <button onClick={() => setEditingMaint(task)} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors">✏️</button>
+                                                    <button onClick={() => archiveMaintenance(task)} className="p-2 hover:bg-amber-50 text-amber-500 rounded-lg transition-colors">📦</button>
+                                                </>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -394,29 +425,31 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
                 </table>
             </div>
 
-            {showModal && (
+            {(showModal || editingMaint) && (
                 <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-md flex items-center justify-center z-[150] p-6">
                     <div className="bg-white rounded-[40px] w-full max-w-md p-10 shadow-2xl scale-in">
-                        <h2 className="text-2xl font-[950] mb-8 uppercase tracking-tighter text-gray-900 border-b pb-4">Нова задача</h2>
-                        <form onSubmit={handleAddTask} className="space-y-6">
+                        <h2 className="text-2xl font-[950] mb-8 uppercase tracking-tighter text-gray-900 border-b pb-4">
+                            {editingMaint ? 'Редагувати ТО' : 'Нова задача ТО'}
+                        </h2>
+                        <form onSubmit={editingMaint ? handleEditTask : handleAddTask} className="space-y-6">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Назва робіт</label>
-                                <input name="title" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 focus:ring-brand-main/20" required />
+                                <input name="title" defaultValue={editingMaint?.title} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 focus:ring-brand-main/20" required />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">ЖК</label>
-                                <select name="complexId" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm">
+                                <select name="complexId" defaultValue={editingMaint?.complexId} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm">
                                     {complexes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Дата</label>
-                                    <input name="date" type="date" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" required />
+                                    <input name="date" type="date" defaultValue={editingMaint?.date} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm" required />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Тип</label>
-                                    <select name="type" className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm">
+                                    <select name="type" defaultValue={editingMaint?.type || 'Електрика'} className="w-full p-4 bg-gray-50 rounded-2xl border-none font-bold text-sm">
                                         <option value="Електрика">⚡️ Електрика</option>
                                         <option value="Сантехніка">🚰 Сантехніка</option>
                                         <option value="Клінінг">🧹 Клінінг</option>
@@ -427,7 +460,7 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
                                 </div>
                             </div>
                             <div className="flex gap-4 pt-4">
-                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400 hover:text-gray-600">Закрити</button>
+                                <button type="button" onClick={() => { setShowModal(false); setEditingMaint(null); }} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400 hover:text-gray-600">Скасувати</button>
                                 <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Зберегти</button>
                             </div>
                         </form>
@@ -437,7 +470,8 @@ const MaintenanceView = ({ complexes, maintenance, setMaintenance, saveToServer,
         </div>
     );
 };
-// ---ПЕРСОНАЛ---
+
+// ======= Team page =======
 const StaffView = ({ users, shifts, logs, createUser, deleteUser, onUpdateProfile, currentUser, deleteShift, editShift }) => {
 const [staffTab, setStaffTab] = useState('list');
 const [showUserModal, setShowUserModal] = useState(false);
@@ -460,11 +494,10 @@ return (
 )}
     </div>
 
-{/* СПИСОК ПРАЦІВНИКІВ */}
 {staffTab === 'list' && (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {users
-            .slice() // Створюємо копію масиву перед сортуванням
+            .slice() 
             .sort((a, b) => {
                 const rolePriority = {
                     'Адмін': 1,
@@ -480,21 +513,18 @@ return (
             })
             .map((u) => (
             <div key={u.id} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group relative">
-                {/* Кнопки редагування / видалення */}
                 <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
                     {(currentUser.role === 'Адмін' || currentUser.id === u.id) && (
                         <button onClick={() => handleEditClick(u)}
                             className="p-2 text-blue-400 hover:text-blue-600 bg-blue-50 rounded-xl transition-colors"
                             title="Редагувати"> ✎ </button>
                     )}
-
                     {currentUser.role === 'Адмін' && currentUser.id !== u.id && (
                         <button onClick={() => deleteUser(u.id)}
                         className="p-2 text-red-400 hover:text-red-600 bg-red-50 rounded-xl transition-colors"
                         title="Видалити"> ✕ </button>
                     )}
                 </div>
-
                 {/* Аватар та основна інформація */}
                 <div className="flex items-center gap-5 mb-6">
                     <img
@@ -510,23 +540,17 @@ return (
                         </div>
                     </div>
                 </div>
-
                 {/* Контактна інформація */}
                 <div className="space-y-3 pt-4 border-t border-gray-50 text-sm font-bold text-gray-700">
                     <p className="flex justify-between">
                         <span className="text-gray-400 text-[10px] uppercase">Email:</span> 
-                        {u.email}
-                    </p>
-
+                        {u.email} </p>
                     <p className="flex justify-between">
                         <span className="text-gray-400 text-[10px] uppercase">Телефон:</span> 
-                        {u.phone || 'Не вказано'}
-                    </p>
-
+                        {u.phone || 'Не вказано'} </p>
                     <p className="flex justify-between">
                         <span className="text-gray-400 text-[10px] uppercase">День народження:</span> 
-                        {u.birthday ? new Date(u.birthday).toLocaleDateString('uk-UA') : 'Не вказано'}
-                    </p>
+                        {u.birthday ? new Date(u.birthday).toLocaleDateString('uk-UA') : 'Не вказано'} </p>
                 </div>
             </div>
         ))}
@@ -543,8 +567,6 @@ return (
             <form onSubmit={async (e) => {
                     e.preventDefault();
                     const fd = new FormData(e.target);
-                    
-                    // Обробка фото (перетворення в Base64)
                     let avatarBase64 = editingUser?.avatar || null;
                     const fileInput = e.target.avatarFile;
                     if (fileInput.files && fileInput.files[0]) {
@@ -555,7 +577,6 @@ return (
                             reader.readAsDataURL(file);
                         });
                     }
-
                     const userData = {
                         id: editingUser ? editingUser.id : Date.now(),
                         name: fd.get('name'),
@@ -563,9 +584,8 @@ return (
                         phone: fd.get('phone'),
                         birthday: fd.get('birthday'),
                         role: fd.get('role') || (editingUser ? editingUser.role : 'worker'),
-                        avatar: avatarBase64 // Зберігаємо нове або старе фото
+                        avatar: avatarBase64 
                     };
-
                     if (!editingUser) {
                         userData.password = fd.get('pass');
                         createUser(userData);
@@ -584,8 +604,7 @@ return (
                             id="preview"
                             src={editingUser?.avatar || 'https://via.placeholder.com/150'} 
                             className="w-24 h-24 rounded-[35px] object-cover ring-4 ring-gray-50 shadow-md"
-                            alt="Preview"
-                        />
+                            alt="Preview" />
                         <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-[35px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-[10px] font-black uppercase">
                             Змінити
                             <input 
@@ -598,8 +617,7 @@ return (
                                         const url = URL.createObjectURL(e.target.files[0]);
                                         document.getElementById('preview').src = url;
                                     }
-                                }}
-                            />
+                                }} />
                         </label>
                     </div>
                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Фото працівника</p>
@@ -672,8 +690,7 @@ return (
     </div>
 )}
 
-
-{/* РОЗКЛАД ЧЕРГУВАНЬ */}
+{/* === Shifts section === */}
 {staffTab === 'shifts' && (
     <div className="bg-white rounded-[25px] md:rounded-[40px] p-5 md:p-10 border border-gray-100 shadow-sm fade-in">
         <div className="flex justify-between items-center mb-6 md:mb-8">
@@ -682,7 +699,7 @@ return (
                 <div className="bg-brand-main/10 text-brand-main px-4 py-2 rounded-xl text-[10px] font-black uppercase">
                     {shifts.length} змін
                 </div>
-                {currentUser?.role === 'Адмін' && (
+                {(currentUser?.role === 'Адмін' || currentUser?.role === 'Директор') && (
                     <button 
                         onClick={() => window.dispatchEvent(new CustomEvent('openShiftModal'))}
                         className="bg-brand-main text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 transition-all shadow-lg"> 
@@ -695,17 +712,21 @@ return (
             <table className="w-full text-left min-w-[600px]">
                 <thead className="bg-gray-50/50 text-[10px] font-black uppercase text-gray-400 tracking-widest">
                     <tr>
-                        <th className="p-4 md:p-5 rounded-l-2xl">Працівник</th>
+                        <th className="p-4 md:p-5 rounded-l-2xl w-12 text-center">#</th> 
+                        <th className="p-4 md:p-5">Працівник</th>
                         <th className="p-4 md:p-5">Час / Період</th>
                         <th className="p-4 md:p-5">Тип</th>
                         <th className="p-4 md:p-5 rounded-r-2xl text-right">Дії</th>
                     </tr>
                 </thead>
                 <tbody className="text-xs md:text-sm font-bold text-gray-700">
-                    {shifts.length > 0 ? shifts.map(shift => {
+                    {shifts.length > 0 ? shifts.map((shift, index) => { 
                         const worker = users.find(u => u.id === Number(shift.userId));
                         return (
                             <tr key={shift.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                <td className="p-4 md:p-5 text-center text-gray-300 font-black italic">
+                                    {index + 1}
+                                </td>
                                 <td className="p-4 md:p-5">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 bg-brand-main/10 rounded-lg flex items-center justify-center text-brand-main text-[10px]">
@@ -737,7 +758,7 @@ return (
                                     </span>
                                 </td>
                                 <td className="p-4 md:p-5 text-right">
-                                    {currentUser?.role === 'Адмін' && (
+                                    {(currentUser?.role === 'Адмін' || currentUser?.role === 'Директор') && (
                                         <div className="flex justify-end gap-2">
                                             <button onClick={() => editShift(shift)} className="p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-all">✎</button>
                                             <button onClick={() => deleteShift(shift.id)} className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition-all">✕</button>
@@ -747,9 +768,7 @@ return (
                             </tr>
                         )
                     }) : (
-                        <tr>
-                            <td colSpan="4" className="p-12 text-center text-gray-300 font-black uppercase text-[10px]">Розклад порожній</td>
-                        </tr>
+                        <tr> <td colSpan="5" className="p-12 text-center text-gray-300 font-black uppercase text-[10px]">Розклад порожній</td> </tr>
                     )}
                 </tbody>
             </table>
@@ -757,7 +776,7 @@ return (
     </div>
 )}
 
-{/* АУДИТ (LOGS) */}
+{/* === Logs section === */}
     {staffTab === 'audit' && (
         <div className="bg-brand-dark rounded-[40px] p-10 shadow-2xl flex flex-col overflow-hidden max-h-[600px]">
             <h3 className="text-xl font-black mb-8 tracking-tight text-white">Системний аудит</h3>
@@ -780,7 +799,8 @@ return (
     </div>
    );
  };
- // --- ГОЛОВНИЙ ДОДАТОК ---
+
+ // ======= Main page & code =======
         const App = () => {
             const [activeTab, setActiveTab] = useState('dashboard');
             const [showModal, setShowModal] = useState(false);
@@ -796,6 +816,7 @@ return (
             const [shiftMode, setShiftMode] = React.useState('single'); 
             const [editingShift, setEditingShift] = React.useState(null);
             const [maintenance, setMaintenance] = useState([]);
+            const [editingTask, setEditingTask] = useState(null);
            useEffect(() => {
     const connectToServer = async () => {
         try {
@@ -806,17 +827,13 @@ return (
             if (data) {
                 if (data.users) {
                     setUsers(data.users);
-
-                    // --- ДОДАЙТЕ ЦЕЙ БЛОК ДЛЯ СИНХРОНІЗАЦІЇ ФОТО ---
                     const session = JSON.parse(localStorage.getItem(SESSION_KEY));
                     if (session && session.user) {
-                        // Шукаємо актуальні дані цього ж користувача в отриманому списку
                         const freshUserData = data.users.find(u => u.id === session.user.id);
                         if (freshUserData) {
-                            setCurrentUser(freshUserData); // Оновлюємо поточного юзера (з новим фото)
+                            setCurrentUser(freshUserData); 
                         }
                     }
-                    // ----------------------------------------------
                 }
                 
                 if (data.tasks) setTasks(data.tasks);
@@ -857,8 +874,7 @@ return (
                     })
                     .catch(err => console.error("Помилка завантаження даних:", err));
             }, []);
-
-            // Функція для відправки змін на сервер
+            // Відправка змін на сервер
             const saveToServer = (dataToSave) => {
                 fetch(`${API_URL}/save`, {
                     method: 'POST',
@@ -936,11 +952,7 @@ return (
         details, 
         user: userName || "Система" 
     };
-
-    // Оновлюємо локальний стейт
     setLogs(prev => [newLog, ...prev]);
-
-    // Відправляємо на сервер
     try {
         await fetch(`${API_URL}/logs`, {
             method: 'POST',
@@ -960,7 +972,7 @@ return (
             };
 
             const editShift = (shift) => {
-                console.log("Редагування зміни:", shift); // Для перевірки в консолі
+                console.log("Редагування зміни:", shift); 
                 setEditingShift(shift);
                 setShiftMode(shift.isRecurring ? 'recurring' : 'single');
                 setShowShiftModal(true);
@@ -1059,7 +1071,7 @@ return (
                 </div>
             </div>
 
-{/* НАВІГАЦІЯ - Додано overflow-y-auto та зменшено відступи */}
+{/* === Navigation section === */}
 <nav className="flex-1 space-y-1 lg:space-y-1.5 overflow-y-auto pr-2 custom-scrollbar">
     {[
         { id: 'dashboard', label: 'Дашборд', icon: 'M3 12l2-2 7-7 7 7 2 2v8a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-8z' },
@@ -1087,13 +1099,11 @@ return (
     ))}
 </nav>
 
-{/* CSS для гарного прихованого скроллу */}
 <style>{`
     .custom-scrollbar::-webkit-scrollbar { width: 3px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     .custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
 `}</style>
-{/* ПРОФІЛЬ ВНИЗУ */}
             <div className="mt-auto pt-10">
                 <div className="bg-black/30 p-5 rounded-[30px] border border-white/5 flex items-center gap-4">
                     <img 
@@ -1101,7 +1111,6 @@ return (
                         className="w-12 h-12 rounded-[18px] object-cover ring-2 ring-brand-main/20 shrink-0" 
                     />
                     <div className="flex-1 min-w-0 py-1">
-                        {/* Прибрано truncate, додано leading-tight для гарного вигляду при переносі */}
                         <div className="font-black text-sm leading-tight break-words">
                             {currentUser.name}
                         </div>
@@ -1125,14 +1134,21 @@ return (
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden pt-16 lg:pt-0">
             <header className="h-20 lg:h-24 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-12 shrink-0">
                <div className="min-w-0">
-    <h1 className="text-lg lg:text-2xl font-[950] text-gray-900 tracking-tight uppercase truncate">
-        {activeTab === 'dashboard' ? 'Панель керування' : 
-         activeTab === 'staff' ? 'Команда' : 
-         activeTab === 'profile' ? 'Мій профіль' : activeTab}
-    </h1>
+   <h1 className="text-lg lg:text-2xl font-[950] text-gray-900 tracking-tight uppercase truncate">
+    {{
+        'dashboard': 'Панель керування',
+        'staff': 'Команда',
+        'profile': 'Мій профіль',
+        'kanban': 'Дошка задач',
+        'maintenance': 'Технічне обслуговування',
+        'inventory': 'Склад / Інвентар',
+        'complexes': 'Житлові комплекси',
+        'archive': 'Архів'
+    }[activeTab] || activeTab}
+</h1>
     <p className="hidden sm:block text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
         {new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', weekday: 'short' })
-            .replace('пт', "п'ятниця") // На випадок скорочення
+            .replace('пт', "п'ятниця") 
             .replace('Пт', "П'ятниця")
         }
     </p>
@@ -1173,7 +1189,7 @@ return (
     ))}
 </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
     {/* ОСТАННІ ДІЇ */}
     <div className="lg:col-span-2 bg-white p-10 rounded-[48px] shadow-sm border border-gray-100">
         <div className="flex justify-between items-center mb-8">
@@ -1200,7 +1216,7 @@ return (
         </div>
     </div>
 
-    {/* ЦЕНТР ЕФЕКТИВНОСТІ (НОВИЙ) */}
+    {/* ЦЕНТР ЕФЕКТИВНОСТІ*/}
     <div className="bg-brand-dark text-white p-10 rounded-[48px] shadow-2xl relative overflow-hidden group border border-white/5">
         <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-main/20 rounded-full blur-3xl group-hover:bg-brand-main/40 transition-all duration-700"></div>
         
@@ -1218,108 +1234,160 @@ return (
                 </div>
             </div>
 
-            {/* СТАТИСТИКА: ГОТОВО ТА ТРЕБА ЗРОБИТИ */}
+           {/* СТАТИСТИКА: ГОТОВО ТА ТРЕБА ЗРОБИТИ */}
 <div className="grid grid-cols-2 gap-4 border-y border-white/10 py-6">
-    <div className="text-center">
-        <div className="text-2xl font-[950] text-white">
-            {/* Беремо всі виконані */}
-            {tasks.filter(t => t.status === 'completed' || t.status === 'done').length}
-        </div>
-        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400 mt-1">Готово</div>
+  <div className="text-center">
+    <div className="text-2xl font-[950] text-white">
+      {tasks.filter(
+        t => t.status === 'completed' || t.status === 'done'
+      ).length}
     </div>
-    <div className="text-center border-l border-white/10">
-        <div className="text-2xl font-[950] text-white">
-            {/* ТУТ ЗМІНЕНО: Фільтруємо ті, що "Треба зробити" */}
-            {tasks.filter(t => t.status === 'todo' || t.status === 'new').length}
-        </div>
-        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400 mt-1">Треба зробити</div>
+    <div className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400 mt-1">
+      Готово
     </div>
-</div>
-            {/* ПРОГРЕС-БАР */}
-            <div className="space-y-3">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-                    <span>Виконання плану</span>
-                    <span className="text-white">
-                        {Math.round((tasks.filter(t => t.status === 'completed' || t.status === 'done').length / (tasks.length || 1)) * 100)}%
-                    </span>
-                </div>
-                <div className="h-3 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
-                    <div 
-                        className="h-full bg-gradient-to-r from-brand-main to-blue-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.3)]" 
-                        style={{ width: `${(tasks.filter(t => t.status === 'completed' || t.status === 'done').length / (tasks.length || 1)) * 100}%` }}
-                    ></div>
-                </div>
-            </div>
+  </div>
 
-            {/* КНОПКИ ДІЙ */}
-            <div className="grid grid-cols-1 gap-3">
-                <button onClick={() => window.print()} className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all text-left group/btn">
-                    <span className="text-[10px] font-black uppercase tracking-widest">Експорт звіту</span>
-                    <span className="text-gray-400 text-[10px]">PDF/CSV</span>
-                </button>
-
-                <button 
-                    onClick={() => {
-                        const done = tasks.filter(t => t.status === 'completed' || t.status === 'done').length;
-                        const pending = tasks.filter(t => t.status === 'pending').length;
-                        const inProgress = tasks.filter(t => t.status === 'in-progress').length;
-                        
-                        alert(
-                            `📊 ПІДСУМОК ДНЯ\n` +
-                            `----------------------\n` +
-                            `✅ ВИКОНАНО: ${done}\n` +
-                            `⚙️ У РОБОТІ: ${inProgress}\n` +
-                            `----------------------\n` +
-                            `Ефективність: ${Math.round((done / (tasks.length || 1)) * 100)}%`
-                        );
-                    }}
-                    className="w-full py-4 bg-white text-brand-dark rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-main hover:text-white transition-all shadow-xl active:scale-95"
-                >
-                    🚀 Аналітика дня
-                </button>
-            </div>
-        </div>
+  <div className="text-center border-l border-white/10">
+    <div className="text-2xl font-[950] text-white">
+      {tasks.filter(
+        t => t.status === 'todo' || t.status === 'new'
+      ).length}
     </div>
+    <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400 mt-1">
+      Треба зробити
+    </div>
+  </div>
 </div>
 
-        {/* НОВИЙ ФУТЕР */}
-        <footer className="mt-16 pt-10 border-t border-gray-100">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-                <div className="flex items-center gap-4">
-                    <div className="bg-gray-900 text-white w-12 h-12 rounded-[20px] flex items-center justify-center font-black text-xl shadow-lg">HT</div>
-                    <div>
-                        <h4 className="font-black text-gray-900 leading-none mb-1">Home Team</h4>
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Спеціально для "Укр Житло Сервіс"</p>
-                    </div>
-                </div>
+{/* ПРОГРЕС-БАР */}
+<div className="space-y-3">
+  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+    <span>Виконання плану</span>
+    <span className="text-white">
+      {Math.round(
+        (tasks.filter(
+          t => t.status === 'completed' || t.status === 'done'
+        ).length / (tasks.length || 1)) * 100
+      )}%
+    </span>
+  </div>
 
-                <div className="flex gap-10">
-                    <div className="hidden md:block">
-                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2 text-center">Статус</p>
-                        <p className="text-sm font-bold text-green-500 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> Сервери онлайн
-                        </p>
-                    </div>
-                    <div className="h-10 w-[1px] bg-gray-100 hidden md:block"></div>
-                    <div>
-                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2 text-center">Час системи</p>
-                        <p className="text-sm font-black text-gray-900 tabular-nums">
-                            {new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                    </div>
-                </div>
+  <div className="h-3 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+    <div
+      className="h-full bg-gradient-to-r from-brand-main to-blue-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+      style={{
+        width: `${
+          (tasks.filter(
+            t => t.status === 'completed' || t.status === 'done'
+          ).length / (tasks.length || 1)) * 100
+        }%`,
+      }}
+    />
+  </div>
+</div>
 
-                <div className="flex flex-col items-center md:items-end text-center md:text-right">
-                <p className="text-[9px] font-black text-black-300 uppercase tracking-[0.2em] leading-relaxed">
-                    © 2026 Home Team • Всі права захищені
-                </p>
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                    Розробниця: <span className="text-gray-500">Вероніка Лебедовська</span>
-                </p>
-            </div>
-            </div>
-        </footer>
+
+           {/* КНОПКИ ДІЙ */}
+<div className="grid grid-cols-1 gap-3">
+  <button
+    onClick={() => window.print()}
+    className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all text-left group/btn"
+  >
+    <span className="text-[10px] font-black uppercase tracking-widest">
+      Експорт звіту
+    </span>
+    <span className="text-gray-400 text-[10px]">PDF/CSV</span>
+  </button>
+
+  <button
+    onClick={() => {
+      const done = tasks.filter(
+        t => t.status === 'completed' || t.status === 'done'
+      ).length;
+
+      const pending = tasks.filter(
+        t => t.status === 'pending'
+      ).length;
+
+      const inProgress = tasks.filter(
+        t => t.status === 'in-progress'
+      ).length;
+
+      alert(
+        `📊 ПІДСУМОК ДНЯ\n` +
+        `----------------------\n` +
+        `✅ ВИКОНАНО: ${done}\n` +
+        `⚙️ У РОБОТІ: ${inProgress}\n` +
+        `----------------------\n` +
+        `Ефективність: ${Math.round(
+          (done / (tasks.length || 1)) * 100
+        )}%`
+      );
+    }}
+    className="w-full py-4 bg-white text-brand-dark rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-main hover:text-white transition-all shadow-xl active:scale-95"
+  >
+    🚀 Аналітика дня
+  </button>
+</div>
+</div>
+</div>
+</div>
+
+{/* === Footer section === */}
+<footer className="mt-16 pt-10 border-t border-gray-100">
+  <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+    <div className="flex items-center gap-4">
+      <div className="bg-gray-900 text-white w-12 h-12 rounded-[20px] flex items-center justify-center font-black text-xl shadow-lg">
+        HT
+      </div>
+      <div>
+        <h4 className="font-black text-gray-900 leading-none mb-1">
+          Home Team
+        </h4>
+        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
+          Спеціально для "Укр Житло Сервіс"
+        </p>
+      </div>
     </div>
+
+    <div className="flex gap-10">
+      <div className="hidden md:block">
+        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2 text-center">
+          Статус
+        </p>
+        <p className="text-sm font-bold text-green-500 flex items-center gap-2">
+          <span className="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+          Сервери онлайн
+        </p>
+      </div>
+
+      <div className="h-10 w-[1px] bg-gray-100 hidden md:block" />
+
+      <div>
+        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2 text-center">
+          Час системи
+        </p>
+        <p className="text-sm font-black text-gray-900 tabular-nums">
+          {new Date().toLocaleTimeString('uk-UA', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </p>
+      </div>
+    </div>
+
+    <div className="flex flex-col items-center md:items-end text-center md:text-right">
+      <p className="text-[9px] font-black text-black-300 uppercase tracking-[0.2em] leading-relaxed">
+        © 2026 Home Team • Всі права захищені
+      </p>
+      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+        Розробниця:{' '}
+        <span className="text-gray-500">Вероніка Лебедовська</span>
+      </p>
+    </div>
+  </div>
+</footer>
+</div>
 )}
 {activeTab === 'kanban' && (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-10 h-full min-h-[600px]">
@@ -1349,6 +1417,16 @@ return (
                                         {task.priority}
                                     </span>
                                     <div className="flex gap-2">
+                                        {/* Кнопка редагування ТІЛЬКИ для адміна */}
+                                        {currentUser?.role === 'Адмін' && (
+                                            <button 
+                                                onClick={() => setEditingTask(task)} 
+                                                title="Редагувати" 
+                                                className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center hover:bg-blue-100 text-xs text-blue-600 transition-colors"
+                                            >
+                                                ✏️
+                                            </button>
+                                        )}
                                         <button onClick={() => archiveTask(task.id)} title="В архів" className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center hover:bg-amber-100 text-xs">📦</button>
                                         <button onClick={() => deleteTask(task.id)} title="Видалити" className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-400 font-bold hover:bg-red-100">✕</button>
                                     </div>
@@ -1400,10 +1478,75 @@ return (
                 </div>
             </div>
         ))}
+
+        {/* МОДАЛЬНЕ ВІКНО РЕДАГУВАННЯ */}
+        {editingTask && (
+            <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                <div className="bg-white rounded-[40px] w-full max-w-xl p-10 shadow-2xl overflow-y-auto max-h-[90vh]">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-2xl font-[950] text-gray-900 uppercase tracking-tight">Редагувати завдання</h2>
+                        <button onClick={() => setEditingTask(null)} className="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+                    </div>
+
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        const updatedTask = {
+                            ...editingTask,
+                            title: formData.get('title'),
+                            locationId: formData.get('locationId'),
+                            assignee: formData.get('assignee'),
+                            priority: formData.get('priority')
+                        };
+                        
+                        // Оновлення стану тасків
+                        setTasks(prev => prev.map(t => t.id === editingTask.id ? updatedTask : t));
+                        setEditingTask(null);
+                        if(typeof addLog === 'function') addLog(`Відредаговано завдання: ${updatedTask.title}`, currentUser.name);
+                    }} className="space-y-6">
+                        
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Назва</label>
+                            <input name="title" defaultValue={editingTask.title} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main font-bold" required />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Об'єкт</label>
+                                <select name="locationId" defaultValue={editingTask.locationId} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main font-bold bg-gray-50">
+                                    {complexes.map(cx => <option key={cx.id} value={cx.id}>{cx.name}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Пріоритет</label>
+                                <select name="priority" defaultValue={editingTask.priority} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main font-bold bg-gray-50">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Виконавець</label>
+                            <select name="assignee" defaultValue={editingTask.assignee} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main font-bold bg-gray-50">
+                                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                            </select>
+                        </div>
+
+                        <button type="submit" className="w-full bg-brand-main text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-blue-600 transition-all">
+                            Зберегти зміни
+                        </button>
+                    </form>
+                </div>
+            </div>
+        )}
     </div>
 )}
+
+{/*======= Kanban page =======*/}
 {activeTab === 'complexes' && (() => {
-    // 1. Групуємо комплекси за містом
     const groupedComplexes = complexes.reduce((groups, cx) => {
         const city = cx.city ? cx.city.trim() : 'Інші';
         const formattedCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
@@ -1411,14 +1554,8 @@ return (
         groups[formattedCity].push(cx);
         return groups;
     }, {});
-
-    // 2. Сортуємо назви міст за алфавітом
     const sortedCities = Object.keys(groupedComplexes).sort((a, b) => a.localeCompare('uk'));
-
-    // Перевірка прав доступу (Адмін або Директор)
     const hasFullAccess = currentUser.role === 'Адмін' || currentUser.role === 'Директор';
-
-    // Функція для редагування
     const handleEdit = (cx) => {
         if (!hasFullAccess) {
             alert("У вас немає прав для редагування об'єктів");
@@ -1448,14 +1585,11 @@ return (
 
     return (
         <div className="fade-in">
-            {/* Шапка секції */}
             <div className="flex justify-between items-center mb-10">
                 <div>
                     <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">База об'єктів (ЖК)</h2>
                     <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-2">Групування за територіальними громадами</p>
                 </div>
-                
-                {/* Кнопка додавання доступна ТІЛЬКИ адміну/директору */}
                 {hasFullAccess && (
                     <button 
                         onClick={() => {
@@ -1475,13 +1609,10 @@ return (
                                 addLog('Комплекси', `Додано новий об'єкт: ${name} (${city})`);
                             }
                         }}
-                        className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all"
-                    >
-                        + Додати об'єкт
-                    </button>
+                        className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all">
+                        + Додати об'єкт </button>
                 )}
             </div>
-
             {complexes.length === 0 ? (
                 <div className="py-20 text-center bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
                     <div className="text-4xl mb-4">🏢</div>
@@ -1505,18 +1636,13 @@ return (
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl shadow-inner">🏢</div>
                                         
-                                        {/* Блок кнопок управління (показуємо лише Адміну/Директору) */}
                                         {hasFullAccess && (
                                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                                <button 
-                                                    onClick={() => handleEdit(cx)}
+                                                <button onClick={() => handleEdit(cx)}
                                                     className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"
-                                                    title="Редагувати"
-                                                >
-                                                    ✎
+                                                    title="Редагувати"> ✎
                                                 </button>
-                                                <button 
-                                                    onClick={() => {
+                                                <button onClick={() => {
                                                         if(confirm(`Видалити ${cx.name}?`)) {
                                                             const updated = complexes.filter(c => c.id !== cx.id);
                                                             setComplexes(updated);
@@ -1525,10 +1651,8 @@ return (
                                                         }
                                                     }}
                                                     className="w-8 h-8 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
-                                                    title="Видалити"
-                                                >
-                                                    ✕
-                                                </button>
+                                                    title="Видалити"> ✕
+                                                 </button>
                                             </div>
                                         )}
                                     </div>
@@ -1564,337 +1688,383 @@ return (
     );
 })()}
 
+{/*======= Calendar page section =======*/}
 {activeTab === 'maintenance' && (
     <MaintenanceView 
         complexes={complexes}
-        maintenance={maintenance}      // Передаємо стан
-        setMaintenance={setMaintenance} // Передаємо функцію зміни
+        maintenance={maintenance}     
+        setMaintenance={setMaintenance} 
         saveToServer={saveToServer} 
         addLog={addLog}
         currentUser={currentUser}
+        setArchiveTasks={setArchiveTasks}
     />
 )}
-{activeTab === 'inventory' && <InventoryView inventory={inventory} setInventory={setInventory} addLog={addLog} />}
-                            
-           {activeTab === 'staff' && (
-                                <StaffView 
-                                    users={users} 
-                                    shifts={shifts} 
-                                    logs={logs} 
-                                    createUser={createUser} 
-                                    deleteUser={deleteUser}
-                                    onUpdateProfile={updateProfile}
-                                    currentUser={currentUser}
-                                    deleteShift={deleteShift} 
-                                    editShift={editShift}
-                                />
-                            )}
 
-               {activeTab === 'profile' && (
-    <div className="max-w-2xl mx-auto fade-in">
-        <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
-            <div className="h-32 bg-brand-main/10 relative"></div>
-            <div className="px-10 pb-10 relative">
-                <div className="flex justify-between items-end -mt-16 mb-8">
-                  <div className="relative group">
-    <img 
-        src={currentUser.avatar || 'https://via.placeholder.com/150'} 
-        className="w-32 h-32 rounded-[40px] border-8 border-white object-cover shadow-lg"
-        id="profile-avatar-preview"
-    />
-    <label className="absolute bottom-2 right-2 bg-white w-10 h-10 rounded-2xl shadow-xl flex items-center justify-center cursor-pointer hover:bg-brand-main hover:text-white transition-all border border-gray-100">
-        📷
-    <input 
-    type="file" 
-    accept="image/*" 
-    className="hidden" 
-  onChange={(e) => {
-    const file = e.target.files[0];
-    if (file) {
-        // Додамо обмеження, щоб файл не був занадто важким для JSON
-        if (file.size > 1024 * 1024) { 
-            alert("Файл занадто великий! Оберіть фото до 1 МБ.");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result;
-
-            // 1. Отримуємо актуальний ID користувача з сесії, якщо стейт currentUser збоїть
-            const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-            const currentId = currentUser?.id || session?.user?.id;
-
-            if (!currentId) {
-                alert("Помилка: користувач не ідентифікований");
-                return;
-            }
-
-            const updatedUser = { ...currentUser, avatar: base64String };
-
-            // 2. Оновлюємо стейт поточного юзера (для картинки на екрані)
-            setCurrentUser(updatedUser);
-
-            // 3. Оновлюємо масив усіх користувачів (це запустить запис у users.json)
-            setUsers(prevUsers => {
-                const newUsers = prevUsers.map(u => u.id === currentId ? updatedUser : u);
-                console.log("Список користувачів оновлено, запускається збереження...");
-                return newUsers;
-            });
-        };
-        reader.readAsDataURL(file);
-    }
-}}
-/>
-    </label>
-</div>
-                  
-                    <button onClick={() => setActiveTab('staff')}
-                        className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-100">
-                        Команда
-                    </button>
-                </div>
-
-                <div className="space-y-6">
-                    <div>
-                        <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">{currentUser.name}</h2>
-                        <span className="inline-block mt-2 px-4 py-1.5 bg-brand-main/10 text-brand-main rounded-xl text-[10px] font-black uppercase tracking-widest">
-                            {currentUser.role}
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-6 rounded-3xl">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Email</p>
-                            <p className="font-bold text-gray-800">{currentUser.email}</p>
-                        </div>
-                        <div className="bg-gray-50 p-6 rounded-3xl">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Телефон</p>
-                            <p className="font-bold text-gray-800">{currentUser.phone || 'Не вказано'}</p>
-                        </div>
-                        <div className="bg-gray-50 p-6 rounded-3xl">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">День народження</p>
-                            <p className="font-bold text-gray-800">
-                                {currentUser.birthday ? new Date(currentUser.birthday).toLocaleDateString('uk-UA') : '—'}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-gray-50 grid grid-cols-1 gap-3">
-                        <h4 className="font-black text-[10px] uppercase tracking-widest text-gray-400">Безпека та дані</h4>
-                        
-                        <button 
-                            onClick={() => {
-                                const newPass = prompt("Введіть новий пароль:");
-                                if (newPass) {
-                                    onUpdateProfile({ ...currentUser, password: newPass });
-                                    alert("Пароль змінено!");
-                                }
-                            }}
-                            className="w-full py-4 rounded-2xl border-2 border-gray-100 text-gray-600 font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-                        >
-                            🔒 Змінити пароль
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{/*======= Inventory page =======*/}
+{activeTab === 'inventory' && (
+  <InventoryView
+    inventory={inventory}
+    setInventory={setInventory}
+    addLog={addLog}
+  />
 )}
-                            {activeTab === 'archive' && (
-                                <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden fade-in">
-                                    <div className="p-8 border-b border-gray-50"><h3 className="text-xl font-black uppercase tracking-tight">Архів</h3></div>
-                                    <div className="divide-y divide-gray-50">
-                                        {archiveTasks.map(task => (
-                                            <div key={task.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
-                                                <div>
-                                                    <div className="font-bold text-gray-800">{task.title}</div>
-                                                    <div className="text-[10px] text-gray-400 uppercase font-black">Завершено: {new Date(task.archivedAt).toLocaleDateString()}</div>
-                                                </div>
-                                                <button onClick={() => deleteTask(task.id, true)} className="text-red-400 hover:text-red-600 font-black text-xs uppercase">Видалити</button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </main>
-{showShiftModal && (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm" onClick={() => { setShowShiftModal(false); setEditingShift(null); }}></div>
-        <div className="bg-white w-full max-w-md rounded-[35px] shadow-2xl relative overflow-hidden fade-in">
-            <div className="p-8">
-                <h3 className="text-xl font-[1000] uppercase italic tracking-tight mb-6">
-                    {editingShift ? '📝 Редагувати зміну' : '✨ Нова зміна'}
-                </h3>
-                
-                {/* Перемикач режимів */}
-                <div className="flex bg-gray-100 p-1 rounded-2xl mb-6">
-                    <button 
-                        type="button"
-                        onClick={() => setShiftMode('single')}
-                        className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${shiftMode === 'single' ? 'bg-white shadow-sm text-brand-main' : 'text-gray-400'}`}>
-                        Конкретна дата
-                    </button>
-                    <button 
-                        type="button"
-                        onClick={() => setShiftMode('recurring')}
-                        className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${shiftMode === 'recurring' ? 'bg-white shadow-sm text-brand-main' : 'text-gray-400'}`}>
-                        Графік (Пн-Пт)
-                    </button>
-                </div>
+           
+{/*======= Team page section=======*/}
+{activeTab === 'staff' && (
+  <StaffView
+    users={users}
+    shifts={shifts}
+    logs={logs}
+    createUser={createUser}
+    deleteUser={deleteUser}
+    onUpdateProfile={updateProfile}
+    currentUser={currentUser}
+    deleteShift={deleteShift}
+    editShift={editShift}
+  />
+)}
 
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target);
-                    
-                    const shiftData = {
-                        id: editingShift ? editingShift.id : Date.now(),
-                        userId: Number(formData.get('userId')),
-                        type: formData.get('type'),
-                        isRecurring: shiftMode === 'recurring',
-                        // Дані для графіка
-                        daysRange: formData.get('daysRange'),
-                        timeRange: formData.get('timeRange'),
-                        // Дані для дати
-                        start: formData.get('start'),
-                        end: formData.get('end'),
+{/*======= Profile page =======*/}
+{activeTab === 'profile' && (
+  <div className="max-w-2xl mx-auto fade-in">
+    <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+      <div className="h-32 bg-brand-main/10 relative" />
+
+      <div className="px-10 pb-10 relative">
+        <div className="flex justify-between items-end -mt-16 mb-8">
+          <div className="relative group">
+            <img
+              src={currentUser.avatar || 'https://via.placeholder.com/150'}
+              className="w-32 h-32 rounded-[40px] border-8 border-white object-cover shadow-lg"
+              id="profile-avatar-preview"
+            />
+
+            <label className="absolute bottom-2 right-2 bg-white w-10 h-10 rounded-2xl shadow-xl flex items-center justify-center cursor-pointer hover:bg-brand-main hover:text-white transition-all border border-gray-100">
+              📷
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+
+                  if (file.size > 1024 * 1024) {
+                    alert('Файл занадто великий! Оберіть фото до 1 МБ.');
+                    return;
+                  }
+
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const base64String = reader.result;
+
+                    const session = JSON.parse(
+                      localStorage.getItem(SESSION_KEY)
+                    );
+                    const currentId =
+                      currentUser?.id || session?.user?.id;
+
+                    if (!currentId) {
+                      alert('Помилка: користувач не ідентифікований');
+                      return;
+                    }
+
+                    const updatedUser = {
+                      ...currentUser,
+                      avatar: base64String,
                     };
 
-                    if (editingShift) {
-                        setShifts(shifts.map(s => s.id === editingShift.id ? shiftData : s));
-                    } else {
-                        setShifts([...shifts, shiftData]);
-                    }
-                    
-                    setShowShiftModal(false);
-                    setEditingShift(null);
-                }} className="space-y-4">
+                    setCurrentUser(updatedUser);
+
+                    setUsers(prevUsers =>
+                      prevUsers.map(u =>
+                        u.id === currentId ? updatedUser : u
+                      )
+                    );
+                  };
+
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+          </div>
+
+          <button
+            onClick={() => setActiveTab('staff')}
+            className="bg-brand-main text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-100">
+            Команда
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-3xl font-[950] text-gray-900 tracking-tight">
+              {currentUser.name}
+            </h2>
+            <span className="inline-block mt-2 px-4 py-1.5 bg-brand-main/10 text-brand-main rounded-xl text-[10px] font-black uppercase tracking-widest">
+              {currentUser.role}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-6 rounded-3xl">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1"> Email </p>
+              <p className="font-bold text-gray-800">
+                {currentUser.email}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-3xl">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1"> Телефон </p>
+              <p className="font-bold text-gray-800">
+                {currentUser.phone || 'Не вказано'}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-3xl">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1"> День народження </p>
+              <p className="font-bold text-gray-800">
+                {currentUser.birthday
+                  ? new Date(
+                      currentUser.birthday
+                    ).toLocaleDateString('uk-UA')
+                  : '—'}
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-gray-50 grid grid-cols-1 gap-3">
+            <h4 className="font-black text-[10px] uppercase tracking-widest text-gray-400"> Безпека та дані</h4>
+            <button onClick={() => {
+                const newPass = prompt('Введіть новий пароль:');
+                if (!newPass) return;
+
+                onUpdateProfile({
+                  ...currentUser,
+                  password: newPass,
+                });
+                alert('Пароль змінено!');
+              }}
+              className="w-full py-4 rounded-2xl border-2 border-gray-100 text-gray-600 font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                🔒 Змінити пароль
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{/*======= Archive page =======*/}
+{activeTab === 'archive' && (
+  <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden fade-in">
+    <div className="p-8 border-b border-gray-50">
+      <h3 className="text-xl font-black uppercase tracking-tight"> Архів </h3>
+    </div>
+
+    <div className="divide-y divide-gray-50">
+      {archiveTasks.map(task => (
+        <div key={task.id}
+          className="p-6 flex items-center justify-between hover:bg-gray-50">
+          <div>
+            <div className="font-bold text-gray-800">
+              {task.title}
+            </div>
+            <div className="text-[10px] text-gray-400 uppercase font-black">
+              Завершено:{' '}
+              {new Date(task.archivedAt).toLocaleDateString()}
+            </div>
+          </div>
+
+          <button
+            onClick={() => deleteTask(task.id, true)}
+            className="text-red-400 hover:text-red-600 font-black text-xs uppercase"> Видалити
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+    </div>
+</main>
+
+{/* === Shifts section modal window === */}
+{showShiftModal && (
+<div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm" onClick={() => { setShowShiftModal(false); setEditingShift(null); }}></div>
+    <div className="bg-white w-full max-w-md rounded-[35px] shadow-2xl relative overflow-hidden fade-in">
+        <div className="p-8">
+            <h3 className="text-xl font-[1000] uppercase italic tracking-tight mb-6">
+                {editingShift ? '📝 Редагувати зміну' : '✨ Нова зміна'}
+            </h3>
+            {/* Перемикач режимів */}
+            <div className="flex bg-gray-100 p-1 rounded-2xl mb-6">
+                <button 
+                    type="button"
+                    onClick={() => setShiftMode('single')}
+                    className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${shiftMode === 'single' ? 'bg-white shadow-sm text-brand-main' : 'text-gray-400'}`}>
+                    Конкретна дата
+                </button>
+                <button 
+                    type="button"
+                    onClick={() => setShiftMode('recurring')}
+                    className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${shiftMode === 'recurring' ? 'bg-white shadow-sm text-brand-main' : 'text-gray-400'}`}>
+                    Графік (Пн-Пт)
+                </button>
+            </div>
+
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                const shiftData = {
+                    id: editingShift ? editingShift.id : Date.now(),
+                    userId: Number(formData.get('userId')),
+                    type: formData.get('type'),
+                    isRecurring: shiftMode === 'recurring',
+                    daysRange: formData.get('daysRange'),
+                    timeRange: formData.get('timeRange'),
+                    start: formData.get('start'),
+                    end: formData.get('end'),
+                };
+
+                if (editingShift) {
+                    setShifts(shifts.map(s => s.id === editingShift.id ? shiftData : s));
+                } else {
+                    setShifts([...shifts, shiftData]);
+                }
+                
+                setShowShiftModal(false);
+                setEditingShift(null);
+            }} className="space-y-4">
+                
+                <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Співробітник</label>
+                    <select name="userId" defaultValue={editingShift?.userId || ""} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
+                        <option value="" disabled>Оберіть працівника...</option>
+                        {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+                    </select>
+                </div>
+
+                {shiftMode === 'single' ? (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Початок</label>
+                            <input type="datetime-local" name="start" defaultValue={editingShift?.start} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[10px]" required />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Кінець</label>
+                            <input type="datetime-local" name="end" defaultValue={editingShift?.end} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[10px]" required />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Дні (напр. Пн-Пт)</label>
+                            <input type="text" name="daysRange" defaultValue={editingShift?.daysRange || "Пн-Пт"} placeholder="Пн-Пт" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[11px]" required />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Час (напр. 8-16)</label>
+                            <input type="text" name="timeRange" defaultValue={editingShift?.timeRange || "08:00 - 16:00"} placeholder="08:00 - 16:00" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[11px]" required />
+                        </div>
+                    </div>
+                )}
+
+                <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Тип зміни</label>
+                    <select name="type" defaultValue={editingShift?.type || "day"} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
+                        <option value="day">☀️ Денна</option>
+                        <option value="night">🌙 Нічна</option>
+                    </select>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={() => { setShowShiftModal(false); setEditingShift(null); }} className="flex-1 bg-gray-100 text-gray-500 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Скасувати</button>
+                    <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:shadow-brand-main/20 transition-all">
+                        {editingShift ? 'Зберегти' : 'Створити'}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+)}
+
+{/* === New task section modal window === */}
+{showModal && (
+    <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-xl flex items-center justify-center z-[100] p-6">
+        <div className="bg-white rounded-[50px] w-full max-w-2xl shadow-2xl fade-in overflow-hidden">
+            <div className="p-12">
+                <div className="flex justify-between items-center mb-10">
+                    <h2 className="text-3xl font-[950] text-gray-900 tracking-tight uppercase">Нова Заявка</h2>
+                    <button onClick={() => setShowModal(false)} className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-900 text-xl font-bold transition-all">✕</button>
+                </div>
+                
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    const nt = {
+                        id: Date.now(),
+                        title: fd.get('t'),
+                        priority: fd.get('p'),
+                        locationId: Number(fd.get('l')),
+                        assignee: Number(fd.get('a')), 
+                        status: 'todo',
+                        createdAt: new Date().toISOString()
+                    };
+                    setTasks(prev => [...prev, nt]);
+                    addLog("Заявка", `Створено задачу: ${nt.title.slice(0, 30)}...`);
+                    setShowModal(false);
+                }} className="space-y-6">
                     
                     <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Співробітник</label>
-                        <select name="userId" defaultValue={editingShift?.userId || ""} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
-                            <option value="" disabled>Оберіть працівника...</option>
-                            {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Опис</label>
+                        <textarea name="t" className="w-full border-2 border-gray-100 p-6 rounded-[30px] mt-2 outline-none focus:border-brand-main transition-all font-bold h-32 resize-none bg-gray-50 focus:bg-white" required />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Пріоритет</label>
+                            <select name="p" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold">
+                                <option value="Низький">Низький</option>
+                                <option value="Середній">Середній</option>
+                                <option value="Високий">Високий</option>
+                                <option value="Критичний">Критичний</option>
+                            </select>
+                        </div>
+                        <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Об'єкт (ЖК)</label>
+                        <select name="l" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
+                            <option value="">Оберіть ЖК...</option>
+                            {[...complexes]
+                                .sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+                                .map(cx => (
+                                    <option key={cx.id} value={cx.id}>{cx.name}</option>
+                                ))
+                            }
+                        </select>
+                    </div>
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Відповідальний</label>
+                        <select name="a" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold">
+                            {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                         </select>
                     </div>
 
-                    {shiftMode === 'single' ? (
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Початок</label>
-                                <input type="datetime-local" name="start" defaultValue={editingShift?.start} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[10px]" required />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Кінець</label>
-                                <input type="datetime-local" name="end" defaultValue={editingShift?.end} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[10px]" required />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Дні (напр. Пн-Пт)</label>
-                                <input type="text" name="daysRange" defaultValue={editingShift?.daysRange || "Пн-Пт"} placeholder="Пн-Пт" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[11px]" required />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Час (напр. 8-16)</label>
-                                <input type="text" name="timeRange" defaultValue={editingShift?.timeRange || "08:00 - 16:00"} placeholder="08:00 - 16:00" className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold text-[11px]" required />
-                            </div>
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Тип зміни</label>
-                        <select name="type" defaultValue={editingShift?.type || "day"} className="w-full border-2 border-gray-100 p-4 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
-                            <option value="day">☀️ Денна</option>
-                            <option value="night">🌙 Нічна</option>
-                        </select>
-                    </div>
-
-                    <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={() => { setShowShiftModal(false); setEditingShift(null); }} className="flex-1 bg-gray-100 text-gray-500 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Скасувати</button>
-                        <button type="submit" className="flex-1 bg-brand-main text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:shadow-brand-main/20 transition-all">
-                            {editingShift ? 'Зберегти' : 'Створити'}
-                        </button>
-                    </div>
+                    <button type="submit" className="w-full bg-brand-main text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-blue-600 transition-all">Створити</button>
                 </form>
             </div>
         </div>
     </div>
 )}
-{showModal && (
-                        <div className="fixed inset-0 bg-brand-dark/80 backdrop-blur-xl flex items-center justify-center z-[100] p-6">
-                            <div className="bg-white rounded-[50px] w-full max-w-2xl shadow-2xl fade-in overflow-hidden">
-                                <div className="p-12">
-                                    <div className="flex justify-between items-center mb-10">
-                                        <h2 className="text-3xl font-[950] text-gray-900 tracking-tight uppercase">Нова Заявка</h2>
-                                        <button onClick={() => setShowModal(false)} className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:text-gray-900 text-xl font-bold transition-all">✕</button>
-                                    </div>
-                                    
-                                    <form onSubmit={(e) => {
-                                        e.preventDefault();
-                                        const fd = new FormData(e.target);
-                                        const nt = {
-                                            id: Date.now(),
-                                            title: fd.get('t'),
-                                            priority: fd.get('p'),
-                                            locationId: Number(fd.get('l')),
-                                            assignee: Number(fd.get('a')), 
-                                            status: 'todo',
-                                            createdAt: new Date().toISOString()
-                                        };
-                                        setTasks(prev => [...prev, nt]);
-                                        addLog("Заявка", `Створено задачу: ${nt.title.slice(0, 30)}...`);
-                                        setShowModal(false);
-                                    }} className="space-y-6">
-                                        
-                                        <div>
-                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Опис</label>
-                                            <textarea name="t" className="w-full border-2 border-gray-100 p-6 rounded-[30px] mt-2 outline-none focus:border-brand-main transition-all font-bold h-32 resize-none bg-gray-50 focus:bg-white" required />
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Пріоритет</label>
-                                                <select name="p" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold">
-                                                    <option value="Низький">Низький</option>
-                                                    <option value="Середній">Середній</option>
-                                                    <option value="Високий">Високий</option>
-                                                    <option value="Критичний">Критичний</option>
-                                                </select>
-                                            </div>
-                                          <div>
-                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Об'єкт (ЖК)</label>
-                                            <select name="l" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold" required>
-                                                <option value="">Оберіть ЖК...</option>
-                                                {[...complexes]
-                                                    .sort((a, b) => a.name.localeCompare(b.name, 'uk'))
-                                                    .map(cx => (
-                                                        <option key={cx.id} value={cx.id}>{cx.name}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                        </div>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Відповідальний</label>
-                                            <select name="a" className="w-full border-2 border-gray-100 p-5 rounded-2xl mt-2 outline-none focus:border-brand-main bg-gray-50 font-bold">
-                                                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                            </select>
-                                        </div>
-
-                                        <button type="submit" className="w-full bg-brand-main text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-blue-600 transition-all">Створити</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+ </div>
+ );
+};
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
 </body>
 </html>
